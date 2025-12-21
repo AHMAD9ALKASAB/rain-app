@@ -65,7 +65,7 @@ public class ChatbotService : IChatbotService
     {
         if (history == null || history.Count == 0)
         {
-            return new ChatbotReply(LocalDefault("ar", string.Empty), false, "local-default");
+            return new ChatbotReply(BuildLocalAnswer("ar", string.Empty), false, "local-default");
         }
 
         var latestUser = history.LastOrDefault(m => string.Equals(m.Role, "user", StringComparison.OrdinalIgnoreCase))?.Content ?? string.Empty;
