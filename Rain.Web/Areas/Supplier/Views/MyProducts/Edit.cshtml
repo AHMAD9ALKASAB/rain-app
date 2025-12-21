@@ -1,0 +1,63 @@
+@model Rain.Web.Areas.Supplier.Controllers.MyProductsController.EditVm
+@{
+  ViewData["Title"] = "تعديل المنتج";
+}
+<h1 class="mb-3">تعديل المنتج</h1>
+<form asp-action="Edit" method="post" enctype="multipart/form-data" class="card p-3">
+  @Html.AntiForgeryToken()
+  <input type="hidden" asp-for="Id" />
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">استبدال الصورة (اختياري)</label>
+      <input type="file" asp-for="Image" class="form-control" accept="image/png,image/jpeg,image/webp" />
+      <span asp-validation-for="Image" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">الاسم المختصر</label>
+      <input asp-for="Name" class="form-control" />
+      <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">اسم البائع/الشركة (اختياري)</label>
+      <input asp-for="SellerName" class="form-control" />
+      <span asp-validation-for="SellerName" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">السعر</label>
+      <input asp-for="Price" class="form-control" />
+      <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">العملة</label>
+      <select asp-for="Currency" class="form-select">
+        @foreach (var c in (string[])ViewBag.Currencies)
+        {
+          <option value="@c" selected="@(Model.Currency == c ? "selected" : null)">@c</option>
+        }
+      </select>
+      <span asp-validation-for="Currency" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">المخزون</label>
+      <input asp-for="StockQty" class="form-control" />
+      <span asp-validation-for="StockQty" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">حد الشراء</label>
+      <input asp-for="MinOrderQty" class="form-control" />
+      <span asp-validation-for="MinOrderQty" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+      <label class="form-label">وصف المنتج</label>
+      <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+      <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+  </div>
+  <div class="mt-3 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">حفظ التعديل</button>
+    <a asp-action="Index" class="btn btn-outline-secondary" onclick="return confirm('إلغاء التعديل؟ ستفقد التغييرات الحالية.');">إلغاء التعديل</a>
+  </div>
+</form>
+@section Scripts{
+  <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,6 @@
+@inject Rain.Web.Services.IRecaptchaVerifier Recaptcha
+@if (Recaptcha.Enabled && !string.IsNullOrWhiteSpace(Recaptcha.SiteKey))
+{
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <div class="g-recaptcha mb-3" data-sitekey="@Recaptcha.SiteKey"></div>
+}

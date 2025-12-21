@@ -1,0 +1,99 @@
+@page
+@model LoginModel
+@{
+    ViewData["Title"] = "تسجيل الدخول";
+    Layout = "_AuthLayout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth-styles.css" />
+}
+
+<div class="auth-container auth-theme-login">
+    <div class="auth-card">
+        <div class="auth-header position-relative">
+            <div class="auth-icon mb-3">
+                <i class="fas fa-user-lock fa-2x"></i>
+            </div>
+            <h1 class="auth-title">مرحباً بك من جديد</h1>
+            <p class="auth-subtitle">سجّل دخولك لمتابعة الطلبات وإدارة حسابك الشخصي</p>
+            <span class="company-badge">دخول آمن</span>
+        </div>
+
+        <div class="auth-body">
+            <ul class="auth-highlights">
+                <li><i class="fas fa-lock"></i>تشفير كامل لبيانات تسجيل الدخول</li>
+                <li><i class="fas fa-bolt"></i>استجابة سريعة وتجربة متجاوبة</li>
+                <li><i class="fas fa-bell"></i>تنبيهات فورية للحركات المهمة</li>
+            </ul>
+
+            <form id="account" method="post" novalidate class="needs-validation">
+                <div class="mb-3">
+                    <label class="form-label text-light small mb-2">نوع الحساب</label>
+                    <select asp-for="Input.AccountType" class="form-select" required>
+                        <option value="">اختر نوع الحساب</option>
+                        <option value="Individual">حساب فردي</option>
+                        <option value="Shop">حساب محل / تاجر</option>
+                        <option value="Supplier">مورد / شركة</option>
+                    </select>
+                    <div class="invalid-feedback">يرجى اختيار نوع الحساب</div>
+                    <span asp-validation-for="Input.AccountType" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" required />
+                            <label asp-for="Input.Email">البريد الإلكتروني</label>
+                            <div class="invalid-feedback">يرجى إدخال بريد إلكتروني صحيح</div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="••••••••" required />
+                            <label asp-for="Input.Password">كلمة المرور</label>
+                            <div class="invalid-feedback">يرجى إدخال كلمة المرور</div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="Input.RememberMe" id="rememberMe" />
+                        <label class="form-check-label" for="rememberMe">تذكرني</label>
+                    </div>
+                    <a id="forgot-password" asp-page="./ForgotPassword" class="small text-info">نسيت كلمة المرور؟</a>
+                </div>
+
+                <partial name="~/Views/Shared/_Recaptcha.cshtml" />
+
+                <button id="login-submit" type="submit" class="btn btn-auth mb-3">
+                    <i class="fas fa-sign-in-alt me-2"></i> تسجيل الدخول
+                </button>
+
+                <div class="auth-footer">
+                    <p class="mb-2 small">لا تملك حساباً بعد؟ اختر نوع التسجيل المناسب لك:</p>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                        <a class="btn btn-outline-light btn-sm" asp-page="/Account/RegisterIndividual">فرد (مفرق)</a>
+                        <a class="btn btn-outline-light btn-sm" asp-page="/Account/RegisterShop">محل (جملة)</a>
+                        <a class="btn btn-outline-light btn-sm" asp-page="/Account/RegisterSupplier">مورد/شركة</a>
+                    </div>
+                    <div class="mt-3 small">
+                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" class="text-info">إعادة إرسال تأكيد البريد</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

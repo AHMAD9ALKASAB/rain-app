@@ -1,0 +1,425 @@
+@page
+@model Rain.Web.Areas.Identity.Pages.Account.RegisterSupplierModel
+@{
+    ViewData["Title"] = "طلب اعتماد مورد/شركة";
+    Layout = "_AuthLayout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth-styles.css" />
+    <style>
+        .plan-card {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .plan-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .plan-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+        
+        .plan-card .form-check-input {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            margin: 0;
+            width: 1.2em;
+            height: 1.2em;
+        }
+        
+        .plan-card .form-check-label {
+            display: block;
+            padding-right: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .plan-card .plan-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        
+        .plan-card .plan-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .plan-card .plan-features {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0 0 0;
+        }
+        
+        .plan-card .plan-features li {
+            padding: 0.25rem 0;
+            position: relative;
+            padding-right: 1.5rem;
+        }
+        
+        .plan-card .plan-features li:before {
+            content: '✓';
+            position: absolute;
+            right: 0;
+            color: var(--success-color);
+        }
+        
+        .company-badge {
+            background: linear-gradient(45deg, #f46b45, #eea849) !important;
+        }
+    </style>
+}
+
+<div class="auth-container auth-theme-supplier">
+    <div class="auth-card">
+        <div class="auth-header position-relative">
+            <div class="auth-icon mb-3">
+                <i class="fas fa-building fa-2x"></i>
+            </div>
+            <h1 class="auth-title">طلب اعتماد مورد/شركة</h1>
+            <p class="auth-subtitle">قدّم منتجاتك بثقة واحصل على حضور رقمي احترافي مع إدارة ذكية للطلبات</p>
+            <span class="company-badge">شريك مميز</span>
+        </div>
+        
+        <div class="auth-body">
+            <ul class="auth-highlights">
+                <li><i class="fas fa-handshake"></i>وصول إلى شبكة واسعة من التجار والمشترين</li>
+                <li><i class="fas fa-box-open"></i>إدارة احترافية للعروض وسلاسل التوريد</li>
+                <li><i class="fas fa-crown"></i>تميز علامتك التجارية بعرض احترافي موحد</li>
+            </ul>
+            <form method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.DisplayName" class="form-control" placeholder="الاسم المعروض" required />
+                                    <label asp-for="Input.DisplayName">الاسم الذي سيظهر في الموقع</label>
+                                    <div class="invalid-feedback">
+                                        يرجى إدخال الاسم المعروض
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.DisplayName" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.FullName" class="form-control" placeholder="الاسم الثلاثي" required />
+                                    <label asp-for="Input.FullName">الاسم الثلاثي</label>
+                                    <div class="invalid-feedback">
+                                        يرجى إدخال الاسم الثلاثي
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-building"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.CompanyOrShopName" class="form-control" placeholder="اسم الشركة/المحل" required />
+                            <label asp-for="Input.CompanyOrShopName">اسم الشركة/المحل</label>
+                            <div class="invalid-feedback">
+                                يرجى إدخال اسم الشركة أو المحل
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.CompanyOrShopName" class="text-danger small"></span>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.PhoneWithCountry" class="form-control" placeholder="رقم الهاتف مع المفتاح" required />
+                                    <label asp-for="Input.PhoneWithCountry">رقم الهاتف مع المفتاح</label>
+                                    <div class="invalid-feedback">
+                                        يرجى إدخال رقم الهاتف مع المفتاح الدولي
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.PhoneWithCountry" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.Email" class="form-control" type="email" placeholder="البريد الإلكتروني" required />
+                                    <label asp-for="Input.Email">البريد الإلكتروني</label>
+                                    <div class="invalid-feedback">
+                                        يرجى إدخال بريد إلكتروني صحيح
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.Password" class="form-control" placeholder="كلمة المرور" autocomplete="new-password" required />
+                                    <label asp-for="Input.Password">كلمة المرور</label>
+                                    <div class="invalid-feedback">
+                                        يرجى إدخال كلمة مرور قوية
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-text small text-muted">يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل</div>
+                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="تأكيد كلمة المرور" autocomplete="new-password" required />
+                                    <label asp-for="Input.ConfirmPassword">تأكيد كلمة المرور</label>
+                                    <div class="invalid-feedback">
+                                        يجب أن تتطابق كلمتا المرور
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <select asp-for="Input.CompanyType" class="form-select" required>
+                                        <option value="">اختر نوع الشركة</option>
+                                        <option value="شركة تجارية">شركة تجارية</option>
+                                        <option value="مصنع">مصنع</option>
+                                        <option value="مستورد">مستورد</option>
+                                        <option value="وكيل حصري">وكيل حصري</option>
+                                        <option value="أخرى">أخرى</option>
+                                    </select>
+                                    <label asp-for="Input.CompanyType">نوع الشركة</label>
+                                    <div class="invalid-feedback">
+                                        يرجى اختيار نوع الشركة
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.CompanyType" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-boxes"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.ProductScope" class="form-control" placeholder="نطاق المنتجات" required />
+                                    <label asp-for="Input.ProductScope">المنتجات التي ستعرضها</label>
+                                    <div class="invalid-feedback">
+                                        يرجى تحديد نطاق المنتجات
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.ProductScope" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.ResidenceLocation" class="form-control" placeholder="مكان الإقامة" required />
+                                    <label asp-for="Input.ResidenceLocation">مكان الإقامة</label>
+                                    <div class="invalid-feedback">
+                                        يرجى إدخال مكان الإقامة
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.ResidenceLocation" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-map-marked-alt"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.ExactLocation" class="form-control" placeholder="الموقع الدقيق" required />
+                                    <label asp-for="Input.ExactLocation">الموقع بالتحديد (اختياري)</label>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.ExactLocation" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label mb-3 d-block fw-bold">اختر خطة الاشتراك المناسبة لك</label>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="plan-card" onclick="selectPlan('Commission')">
+                                <input class="form-check-input" type="radio" id="planCom" name="Input.PlanType" value="Commission" checked>
+                                <label class="form-check-label plan-title" for="planCom">خطة العمولة</label>
+                                <div class="plan-price">2% عمولة</div>
+                                <p class="text-muted small">مثالية للمبتدئين والشركات الصغيرة</p>
+                                <ul class="plan-features">
+                                    <li>لا توجد رسوم شهرية</li>
+                                    <li>عمولة 2% على كل عملية بيع</li>
+                                    <li>دفع الأرباح أسبوعياً</li>
+                                    <li>دعم فني على مدار الساعة</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="plan-card" onclick="selectPlan('Subscription')">
+                                <input class="form-check-input" type="radio" id="planSub" name="Input.PlanType" value="Subscription">
+                                <label class="form-check-label plan-title" for="planSub">الاشتراك الشهري</label>
+                                <div class="plan-price">20$ <span class="text-muted small fw-normal">/ شهرياً</span></div>
+                                <p class="text-muted small">مثالية للشركات الكبيرة والمتوسطة</p>
+                                <ul class="plan-features">
+                                    <li>رسوم شهرية ثابتة 20$</li>
+                                    <li>لا توجد عمولات إضافية</n                                    <li>أولوية في عرض المنتجات</li>
+                                    <li>إحصائيات متقدمة</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-1"></i>
+                        في حال اختيار خطة الاشتراك الشهري، سنقوم بالاتصال بك لاستكمال إجراءات الدفع وتفعيل الحساب.
+                    </div>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                    <label class="form-check-label small legal-links" for="termsCheck">
+                        أوافق على
+                        <a data-bs-toggle="modal" data-bs-target="#termsModal">الشروط والأحكام</a>
+                        و
+                        <a data-bs-toggle="modal" data-bs-target="#privacyModal">سياسة الخصوصية</a>
+                    </label>
+                    <div class="invalid-feedback">
+                        يجب الموافقة على الشروط والأحكام
+                    </div>
+                </div>
+                
+                <partial name="~/Views/Shared/_Recaptcha.cshtml" />
+                
+                <button type="submit" class="btn btn-auth mb-3">
+                    <i class="fas fa-paper-plane me-2"></i> إرسال طلب الاعتماد
+                </button>
+                
+                <div class="text-center mt-3">
+                    <p class="mb-0">لديك حساب بالفعل؟ <a asp-page="./Login" class="text-primary fw-bold">سجل دخولك</a></p>
+                </div>
+            </form>
+        </div>
+        
+        <div class="auth-footer">
+            <p class="mb-0 small">سيتم مراجعة طلبك من قبل إدارة المنصة والاتصال بك خلال 48 ساعة</p>
+        </div>
+    </div>
+</div>
+
+<!-- Floating decoration elements -->
+<div class="login-decoration decoration-1"></div>
+<div class="login-decoration decoration-2"></div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Enable form validation
+        (function () {
+            'use strict'
+            
+            // Fetch the form we want to apply custom validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+            
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+            
+            // Password match validation
+            var password = document.querySelector('input[name="Input.Password"]')
+            var confirmPassword = document.querySelector('input[name="Input.ConfirmPassword"]')
+            
+            function validatePassword() {
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity("كلمات المرور غير متطابقة")
+                } else {
+                    confirmPassword.setCustomValidity("")
+                }
+            }
+            
+            password.onchange = validatePassword
+            confirmPassword.onkeyup = validatePassword
+        })()
+        
+        // Plan selection
+        function selectPlan(planType) {
+            document.querySelectorAll('.plan-card').forEach(card => {
+                card.classList.remove('selected')
+            })
+            
+            const selectedCard = document.querySelector(`input[value="${planType}"]`).parentElement
+            selectedCard.classList.add('selected')
+            document.querySelector(`input[value="${planType}"]`).checked = true
+        }
+        
+        // Initialize selected plan
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedPlan = document.querySelector('input[name="Input.PlanType"]:checked').value
+            selectPlan(selectedPlan)
+        })
+    </script>
+}

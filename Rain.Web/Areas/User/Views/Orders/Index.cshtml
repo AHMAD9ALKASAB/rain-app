@@ -1,0 +1,35 @@
+@using Rain.Domain.Entities
+@model List<Order>
+@{
+    ViewData["Title"] = "طلباتي";
+}
+<div class="container py-3">
+    <h3 class="mb-3">طلباتي</h3>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>التاريخ</th>
+                    <th>الإجمالي</th>
+                    <th>الحالة</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var o in Model)
+            {
+                <tr>
+                    <td>@o.Id</td>
+                    <td>@o.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td>
+                    <td>@o.Total.ToString("0.00")</td>
+                    <td>@o.Status</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details", new { id = o.Id })">تفاصيل</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

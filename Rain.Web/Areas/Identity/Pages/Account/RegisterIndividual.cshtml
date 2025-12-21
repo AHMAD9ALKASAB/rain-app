@@ -1,0 +1,176 @@
+@page
+@model Rain.Web.Areas.Identity.Pages.Account.RegisterIndividualModel
+@{
+    ViewData["Title"] = "إنشاء حساب فرد";
+    Layout = "_AuthLayout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth-styles.css" />
+}
+
+<div class="auth-container auth-theme-individual">
+    <div class="auth-card">
+        <div class="auth-header position-relative">
+            <div class="auth-icon mb-3">
+                <i class="fas fa-user-tie fa-2x"></i>
+            </div>
+            <h1 class="auth-title">إنشاء حساب فرد</h1>
+            <p class="auth-subtitle">انضم إلى مجتمعنا واستمتع بأفضل العروض والمنتجات الموصى بها لك</p>
+            <span class="individual-badge">عضو مميز</span>
+        </div>
+        
+        <div class="auth-body">
+            <ul class="auth-highlights">
+                <li><i class="fas fa-star"></i>ملف شخصي مميز يعكس هويتك</li>
+                <li><i class="fas fa-gift"></i>وصول لعروض حصرية ومكافآت شهرية</li>
+                <li><i class="fas fa-shield-alt"></i>حماية بياناتك بتشفير عالي وموثوقية</li>
+            </ul>
+            <form method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger small" role="alert"></div>
+                
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.FullName" class="form-control" placeholder="الاسم الكامل" required />
+                            <label asp-for="Input.FullName">الاسم الكامل</label>
+                            <div class="invalid-feedback">
+                                يرجى إدخال الاسم الكامل
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.Email" class="form-control" placeholder="البريد الإلكتروني" type="email" required />
+                            <label asp-for="Input.Email">البريد الإلكتروني</label>
+                            <div class="invalid-feedback">
+                                يرجى إدخال بريد إلكتروني صحيح
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.PhoneNumber" class="form-control" placeholder="رقم الهاتف" />
+                            <label asp-for="Input.PhoneNumber">رقم الهاتف (اختياري)</label>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.Password" class="form-control" placeholder="كلمة المرور" autocomplete="new-password" required />
+                            <label asp-for="Input.Password">كلمة المرور</label>
+                            <div class="invalid-feedback">
+                                يرجى إدخال كلمة مرور قوية
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text small text-muted">يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل</div>
+                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="تأكيد كلمة المرور" autocomplete="new-password" required />
+                            <label asp-for="Input.ConfirmPassword">تأكيد كلمة المرور</label>
+                            <div class="invalid-feedback">
+                                يجب أن تتطابق كلمتا المرور
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                    <label class="form-check-label small legal-links" for="termsCheck">
+                        أوافق على
+                        <a data-bs-toggle="modal" data-bs-target="#termsModal">الشروط والأحكام</a>
+                        و
+                        <a data-bs-toggle="modal" data-bs-target="#privacyModal">سياسة الخصوصية</a>
+                    </label>
+                    <div class="invalid-feedback">
+                        يجب الموافقة على الشروط والأحكام
+                    </div>
+                </div>
+
+                <partial name="~/Views/Shared/_Recaptcha.cshtml" />
+
+                <button type="submit" class="btn btn-auth mb-3">
+                    <i class="fas fa-user-plus me-2"></i> إنشاء حساب
+                </button>
+
+                <div class="text-center mt-3">
+                    <p class="mb-0">لديك حساب بالفعل؟ <a asp-page="./Login" class="text-primary fw-bold">سجل دخولك</a></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            <p class="mb-0 small">© @DateTime.Now.Year منصة رين. جميع الحقوق محفوظة</p>
+        </div>
+    </div>
+</div>
+
+<!-- Floating decoration elements -->
+<div class="login-decoration decoration-1"></div>
+<div class="login-decoration decoration-2"></div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Enable form validation
+        (function () {
+            'use strict'
+            
+            // Fetch the form we want to apply custom validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+            
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+            
+            // Password match validation
+            var password = document.querySelector('input[name="Input.Password"]')
+            var confirmPassword = document.querySelector('input[name="Input.ConfirmPassword"]')
+            
+            function validatePassword() {
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity("كلمات المرور غير متطابقة")
+                } else {
+                    confirmPassword.setCustomValidity("")
+                }
+            }
+            
+            if (password && confirmPassword) {
+                password.onchange = validatePassword;
+                confirmPassword.onkeyup = validatePassword;
+            }
+        })()
+    </script>
+}

@@ -1,0 +1,133 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <section>
+            <h1 class="mb-3">@ViewData["Title"]</h1>
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <div class="mb-3">
+                    <label class="form-label">نوع الحساب</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="accIndividual" name="Input.AccountType" value="Individual" checked>
+                            <label class="form-check-label" for="accIndividual">فرد (مفرق)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="accShop" name="Input.AccountType" value="Shop">
+                            <label class="form-check-label" for="accShop">محل (جملة)</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" id="accSupplier" name="Input.AccountType" value="Supplier">
+                            <label class="form-check-label" for="accSupplier">مورد/شركة</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+                    <label asp-for="Input.Email"></label>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" />
+                    <label asp-for="Input.Password"></label>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
+                    <label asp-for="Input.ConfirmPassword"></label>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div id="supplierFields" class="border rounded p-3 mb-3" style="display:none">
+                    <h5 class="mb-3">بيانات طلب حساب المورد/الشركة</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Input.DisplayName" class="form-control" />
+                                <label asp-for="Input.DisplayName">الاسم الظاهر في الموقع</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Input.FullName" class="form-control" />
+                                <label asp-for="Input.FullName">الاسم الثلاثي</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Input.CompanyOrShopName" class="form-control" />
+                                <label asp-for="Input.CompanyOrShopName">اسم الشركة/المحل</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Input.PhoneWithCountry" class="form-control" />
+                                <label asp-for="Input.PhoneWithCountry">الهاتف مع نداء الدولة</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Input.CompanyType" class="form-control" />
+                                <label asp-for="Input.CompanyType">نوع الشركة</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Input.ProductScope" class="form-control" />
+                                <label asp-for="Input.ProductScope">مجال المنتجات</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Input.ResidenceLocation" class="form-control" />
+                                <label asp-for="Input.ResidenceLocation">مكان الإقامة</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Input.ExactLocation" class="form-control" />
+                                <label asp-for="Input.ExactLocation">الموقع بالتحديد</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">الخطة</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="planSub" name="Input.PlanType" value="Subscription">
+                                    <label class="form-check-label" for="planSub">اشتراك شهري 20$</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" id="planCom" name="Input.PlanType" value="Commission" checked>
+                                    <label class="form-check-label" for="planCom">عمولة 2% على كل منتج</label>
+                                </div>
+                            </div>
+                            <div class="form-text">عند اختيار الاشتراك سنتواصل معك لتفاصيل الدفع. عند اختيار العمولة تُخصم 2% تلقائياً عند الشراء.</div>
+                        </div>
+                    </div>
+                </div>
+                <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+            </form>
+            <div class="mt-3">
+                <p><a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Already have an account?</a></p>
+            </div>
+        </section>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+      (()=>{
+        const radios = document.querySelectorAll('input[name="Input.AccountType"]');
+        const box = document.getElementById('supplierFields');
+        function sync(){
+          const v = document.querySelector('input[name="Input.AccountType"]:checked')?.value;
+          box.style.display = v === 'Supplier' ? '' : 'none';
+        }
+        radios.forEach(r=>r.addEventListener('change', sync));
+        sync();
+      })();
+    </script>
+}

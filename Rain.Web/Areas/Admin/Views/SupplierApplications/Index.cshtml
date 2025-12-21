@@ -1,0 +1,38 @@
+@model IEnumerable<Rain.Domain.Entities.SupplierApplication>
+@{
+    ViewData["Title"] = "طلبات الموردين";
+}
+<h1 class="mb-3">طلبات الموردين</h1>
+<div class="mb-3">
+    <a class="btn btn-outline-secondary me-2" asp-action="Index">الكل</a>
+    <a class="btn btn-outline-secondary me-2" asp-action="Index" asp-route-status="Pending">قيد المراجعة</a>
+    <a class="btn btn-outline-secondary me-2" asp-action="Index" asp-route-status="Approved">مقبول</a>
+    <a class="btn btn-outline-secondary" asp-action="Index" asp-route-status="Rejected">مرفوض</a>
+</div>
+<table class="table table-striped align-middle">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>الاسم الظاهر</th>
+        <th>الشركة/المحل</th>
+        <th>الهاتف</th>
+        <th>الخطة</th>
+        <th>الحالة</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var a in Model)
+    {
+        <tr>
+            <td>@a.Id</td>
+            <td>@a.DisplayName</td>
+            <td>@a.CompanyOrShopName</td>
+            <td>@a.PhoneWithCountry</td>
+            <td>@a.PlanType</td>
+            <td>@a.Status</td>
+            <td><a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@a.Id">عرض</a></td>
+        </tr>
+    }
+    </tbody>
+</table>

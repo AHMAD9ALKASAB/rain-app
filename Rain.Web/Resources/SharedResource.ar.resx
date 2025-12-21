@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppName" xml:space="preserve">
+    <value>رين</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>الرئيسية</value>
+  </data>
+  <data name="Products" xml:space="preserve">
+    <value>المنتجات</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>تسجيل الدخول</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>إنشاء حساب</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>تسجيل الخروج</value>
+  </data>
+  <data name="EmailGreeting" xml:space="preserve">
+    <value>مرحبًا</value>
+  </data>
+  <data name="EmailSignature" xml:space="preserve">
+    <value>تحياتنا
+فريق رين</value>
+  </data>
+  <data name="OrderCreatedSubject" xml:space="preserve">
+    <value>تم استلام طلبك</value>
+  </data>
+  <data name="OrderAcceptedSubject" xml:space="preserve">
+    <value>تم قبول طلبك</value>
+  </data>
+  <data name="OrderShippedSubject" xml:space="preserve">
+    <value>تم شحن طلبك</value>
+  </data>
+  <data name="OrderDeliveredSubject" xml:space="preserve">
+    <value>تم تسليم طلبك</value>
+  </data>
+  <data name="PaymentSucceededSubject" xml:space="preserve">
+    <value>تم تأكيد الدفع</value>
+  </data>
+  <data name="PaymentFailedSubject" xml:space="preserve">
+    <value>فشل الدفع</value>
+  </data>
+  <data name="PaymentRefundedSubject" xml:space="preserve">
+    <value>تم استرداد المبلغ</value>
+  </data>
+  <data name="BrowseProducts" xml:space="preserve">
+    <value>تصفح المنتجات</value>
+  </data>
+  <data name="SearchKeyword" xml:space="preserve">
+    <value>كلمة البحث</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>الفئة</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>الكل</value>
+  </data>
+  <data name="Brand" xml:space="preserve">
+    <value>الماركة</value>
+  </data>
+  <data name="Sort" xml:space="preserve">
+    <value>الترتيب</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="PriceAsc" xml:space="preserve">
+    <value>السعر تصاعدي</value>
+  </data>
+  <data name="PriceDesc" xml:space="preserve">
+    <value>السعر تنازلي</value>
+  </data>
+  <data name="MinPrice" xml:space="preserve">
+    <value>السعر الأدنى</value>
+  </data>
+  <data name="MaxPrice" xml:space="preserve">
+    <value>السعر الأقصى</value>
+  </data>
+  <data name="MinRating" xml:space="preserve">
+    <value>أقل تقييم</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>بحث</value>
+  </data>
+  <data name="StartingFrom" xml:space="preserve">
+    <value>ابتداءً من</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>التفاصيل</value>
+  </data>
+  <data name="Supplier" xml:space="preserve">
+    <value>المورّد</value>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>الإدارة</value>
+  </data>
+  <data name="Privacy" xml:space="preserve">
+    <value>الخصوصية</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>الحساب</value>
+  </data>
+  <data name="ResendConfirmation" xml:space="preserve">
+    <value>إعادة إرسال التأكيد</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>المظهر</value>
+  </data>
+</root>

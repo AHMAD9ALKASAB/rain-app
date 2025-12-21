@@ -1,0 +1,39 @@
+@using Rain.Domain.Entities
+@model List<SupplierOffer>
+@{
+    ViewData["Title"] = "عروضي";
+}
+<div class="container py-3">
+    <h3 class="mb-3">عروضي</h3>
+    <a class="btn btn-primary btn-sm mb-3" href="@Url.Action("Create")">إضافة عرض</a>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>المنتج</th>
+                    <th>السعر</th>
+                    <th>الحد الأدنى</th>
+                    <th>المخزون</th>
+                    <th>مفعل</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var o in Model)
+            {
+                <tr>
+                    <td>@o.Product?.Name</td>
+                    <td>@o.Price.ToString("0.00")</td>
+                    <td>@o.MinOrderQty</td>
+                    <td>@o.StockQty</td>
+                    <td>@(o.IsActive?"نعم":"لا")</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary" href="@Url.Action("Edit", new { id=o.Id })">تعديل</a>
+                        <a class="btn btn-sm btn-outline-danger" href="@Url.Action("Delete", new { id=o.Id })">حذف</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

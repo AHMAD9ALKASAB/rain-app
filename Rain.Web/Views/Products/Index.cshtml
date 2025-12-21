@@ -1,0 +1,200 @@
+@using Rain.Domain.Entities
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Rain.Web.SharedResource> L
+@model List<Product>
+@{
+    ViewData["Title"] = L["Products"];
+    var total = (int)(ViewBag.Total ?? 0);
+    var page = (int)(ViewBag.Page ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 12);
+    var pages = (int)System.Math.Ceiling((double)System.Math.Max(total, 1) / pageSize);
+    string? keyword = ViewBag.Keyword as string;
+    int? categoryId = ViewBag.CategoryId as int?;
+    int? brandId = ViewBag.BrandId as int?;
+    string? sort = ViewBag.Sort as string;
+    var categories = ViewBag.Categories as IEnumerable<Category> ?? Enumerable.Empty<Category>();
+    var brands = ViewBag.Brands as IEnumerable<Brand> ?? Enumerable.Empty<Brand>();
+    decimal? minPrice = ViewBag.MinPrice as decimal?;
+    decimal? maxPrice = ViewBag.MaxPrice as decimal?;
+    double? minRating = ViewBag.MinRating as double?;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/products.css" />
+}
+
+<div class="products-hero text-center text-white py-5 mb-5">
+    <div class="container position-relative">
+        <span class="badge rounded-pill bg-gradient text-uppercase mb-3">الأكثر رواجاً</span>
+        <h1 class="display-5 fw-bold mb-3">استكشف المنتجات</h1>
+        <p class="lead mb-4 hero-subtitle mx-auto">
+            أفضل المنتجات من موردين موثوقين، أسعار شاملة وعروض حصرية للتجارة الذكية.
+        </p>
+        <div class="hero-search shadow-lg rounded-pill d-flex align-items-center flex-wrap">
+            <i class="fas fa-search text-muted ms-3"></i>
+            <form method="get" class="d-flex flex-grow-1 align-items-center mt-3 mt-md-0">
+                <input type="text" name="keyword" value="@keyword" class="form-control border-0 bg-transparent" placeholder="ابحث عن منتج أو علامة..." />
+                <button class="btn btn-primary rounded-pill px-4 ms-md-3 mt-3 mt-md-0" type="submit">ابحث</button>
+            </form>
+        </div>
+    </div>
+    <div class="hero-shape hero-shape-1"></div>
+    <div class="hero-shape hero-shape-2"></div>
+    <div class="hero-shape hero-shape-3"></div>
+}
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <div class="col-lg-3">
+            <div class="filter-card p-4 rounded-4 shadow-sm">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="filter-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted small mb-0">فلترة مخصصة</p>
+                        <h5 class="mb-0">المرشّحات</h5>
+                    </div>
+                </div>
+                <form method="get" class="filters-form">
+                    <div class="mb-3">
+                        <label class="form-label">التصنيف</label>
+                        <select name="categoryId" class="form-select">
+                            <option value="">الكل</option>
+                            @foreach (var c in categories)
+                            {
+                                <option value="@c.Id" selected="@(categoryId == c.Id)">@c.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">العلامة التجارية</label>
+                        <select name="brandId" class="form-select">
+                            <option value="">الكل</option>
+                            @foreach (var b in brands)
+                            {
+                                <option value="@b.Id" selected="@(brandId == b.Id)">@b.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col">
+                            <label class="form-label">أدنى سعر</label>
+                            <input name="minPrice" value="@((minPrice.HasValue ? minPrice.Value.ToString("0.##") : ""))" class="form-control" />
+                        </div>
+                        <div class="col">
+                            <label class="form-label">أعلى سعر</label>
+                            <input name="maxPrice" value="@((maxPrice.HasValue ? maxPrice.Value.ToString("0.##") : ""))" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">التقييم الأدنى</label>
+                        <input name="minRating" value="@((minRating.HasValue ? minRating.Value.ToString("0.0") : ""))" class="form-control" />
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">الترتيب</label>
+                        <select name="sort" class="form-select">
+                            <option value="">الأسم (أ-ي)</option>
+                            <option value="price_asc" selected="@(sort == "price_asc")">السعر: من الأقل إلى الأعلى</option>
+                            <option value="price_desc" selected="@(sort == "price_desc")">السعر: من الأعلى إلى الأقل</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary w-100 rounded-pill">تطبيق المرشحات</button>
+                </form>
+            </div>
+            <div class="insight-card mt-4 p-4 rounded-4 shadow-sm">
+                <p class="text-uppercase text-muted small mb-2">إحصاءات</p>
+                <h5 class="fw-semibold mb-1">@total منتج متاح</h5>
+                <p class="small text-muted mb-0">تصفح منتجات متنوعة من موردين معتمدين داخل وخارج المنصة.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <p class="text-muted small mb-1">يعرض النتائج المتاحة</p>
+                    <h5 class="mb-0">@total نتيجة</h5>
+                </div>
+                <div class="d-flex gap-2">
+                    <span class="view-toggle active"><i class="fas fa-th-large"></i></span>
+                    <span class="view-toggle"><i class="fas fa-list"></i></span>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var item in Model)
+                {
+                    var activeOffers = item.SupplierOffers?.Where(o => o.IsActive).ToList() ?? new List<SupplierOffer>();
+                    var minOffer = activeOffers.OrderBy(o => o.Price).FirstOrDefault();
+                    var topRated = activeOffers.Where(o => o.RatingsCount > 0).OrderByDescending(o => o.AverageRating).FirstOrDefault();
+                    var heroImage = item.Images?.FirstOrDefault()?.Url ?? $"https://images.unsplash.com/seed/rain-{item.Id}/640x640?auto=format&fit=crop&bg=fff&product";
+                    var offersCount = activeOffers.Count;
+                    <div class="col-12 col-sm-6 col-xl-4">
+                        <div class="product-card h-100 rounded-4 shadow-sm d-flex flex-column">
+                            <div class="product-card__media position-relative overflow-hidden">
+                                <img src="@heroImage" alt="@item.Name" class="product-thumb" loading="lazy" />
+                                <div class="product-media-overlay">
+                                    <div>
+                                        <span class="text-uppercase small text-white-50">@item.Brand?.Name ?? "—"</span>
+                                        <p class="mb-0 text-white">@item.Category?.Name ?? L["Category"]</p>
+                                    </div>
+                                    <span class="text-white-50 small"><i class="fas fa-box-open me-1"></i>@offersCount @L["Offers"]</span>
+                                </div>
+                                @if (topRated != null && topRated.AverageRating >= 4)
+                                {
+                                    <span class="product-badge">@string.Format("{0:0.0}★", topRated.AverageRating)</span>
+                                }
+                            </div>
+                            <div class="product-card__body d-flex flex-column flex-grow-1">
+                                <span class="product-category text-uppercase small text-muted">@item.Category?.Name</span>
+                                <h5 class="mt-1 mb-2 text-truncate">@item.Name</h5>
+                                <p class="text-muted small mb-3 line-clamp-2">@item.Description</p>
+                                <div class="product-card__meta mb-3">
+                                    <span class="meta-chip">
+                                        <i class="fas fa-user-tie me-1"></i>@(item.SellerName ?? item.Brand?.Name ?? "RAIN")
+                                    </span>
+                                    <span class="meta-chip">
+                                        <i class="fas fa-language me-1"></i>@(item.Brand?.Name ?? "—")
+                                    </span>
+                                    @if (topRated != null)
+                                    {
+                                        <span class="meta-chip rating-chip">
+                                            <i class="fas fa-star me-1"></i>@topRated.AverageRating.ToString("0.0") (@topRated.RatingsCount)
+                                        </span>
+                                    }
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    @if (minOffer != null)
+                                    {
+                                        <div>
+                                            <span class="price">@minOffer.Price.ToString("0.00")</span>
+                                            <small class="text-muted">@minOffer.Currency</small>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">لا توجد عروض</span>
+                                    }
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill">عرض التفاصيل</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (pages > 1)
+            {
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center flex-wrap gap-2">
+                        @for (int p = 1; p <= pages; p++)
+                        {
+                            <li class="page-item @(p == page ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { keyword, categoryId, brandId, sort, page = p, pageSize })">@p</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>

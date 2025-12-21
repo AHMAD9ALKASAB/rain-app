@@ -1,0 +1,47 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+/Rain.Web/wwwroot/lib/
+
+# User secrets and sensitive config
+appsettings.*.Development.json
+appsettings.*.Local.json
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Publish outputs
+[Pp]ublish/
+*.pubxml
+*.pubxml.user
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Dotnet tools
+*.nupkg
+*.snupkg
+*.lock.json
+project.lock.json
+
+# Entity Framework
+*.dbmdl
+*.jfm
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user

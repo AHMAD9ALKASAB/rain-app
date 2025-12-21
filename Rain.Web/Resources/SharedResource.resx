@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppName" xml:space="preserve">
+    <value>رين - RAIN</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Products" xml:space="preserve">
+    <value>Products</value>
+  </data>
+  <data name="Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Register</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="EmailGreeting" xml:space="preserve">
+    <value>Hello</value>
+  </data>
+  <data name="EmailSignature" xml:space="preserve">
+    <value>Best regards,
+Rain Team</value>
+  </data>
+  <data name="OrderCreatedSubject" xml:space="preserve">
+    <value>Your order has been received</value>
+  </data>
+  <data name="OrderAcceptedSubject" xml:space="preserve">
+    <value>Your order has been accepted</value>
+  </data>
+  <data name="OrderShippedSubject" xml:space="preserve">
+    <value>Your order has been shipped</value>
+  </data>
+  <data name="OrderDeliveredSubject" xml:space="preserve">
+    <value>Your order has been delivered</value>
+  </data>
+  <data name="PaymentSucceededSubject" xml:space="preserve">
+    <value>Payment confirmed</value>
+  </data>
+  <data name="PaymentFailedSubject" xml:space="preserve">
+    <value>Payment failed</value>
+  </data>
+  <data name="PaymentRefundedSubject" xml:space="preserve">
+    <value>Payment refunded</value>
+  </data>
+  <data name="BrowseProducts" xml:space="preserve">
+    <value>Browse Products</value>
+  </data>
+  <data name="SearchKeyword" xml:space="preserve">
+    <value>Keyword</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Brand" xml:space="preserve">
+    <value>Brand</value>
+  </data>
+  <data name="Sort" xml:space="preserve">
+    <value>Sort</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="PriceAsc" xml:space="preserve">
+    <value>Price (Low to High)</value>
+  </data>
+  <data name="PriceDesc" xml:space="preserve">
+    <value>Price (High to Low)</value>
+  </data>
+  <data name="MinPrice" xml:space="preserve">
+    <value>Min price</value>
+  </data>
+  <data name="MaxPrice" xml:space="preserve">
+    <value>Max price</value>
+  </data>
+  <data name="MinRating" xml:space="preserve">
+    <value>Min rating</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="StartingFrom" xml:space="preserve">
+    <value>Starting from</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Supplier" xml:space="preserve">
+    <value>Supplier</value>
+  </data>
+  <data name="Admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="Privacy" xml:space="preserve">
+    <value>Privacy</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="ResendConfirmation" xml:space="preserve">
+    <value>Resend confirmation</value>
+  </data>
+  <data name="Theme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+</root>

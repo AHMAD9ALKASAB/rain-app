@@ -1,0 +1,113 @@
+@model IEnumerable<Rain.Domain.Entities.SupplierOffer>
+@{
+    ViewData["Title"] = "منتجاتي";
+    var total = Model?.Count() ?? 0;
+    var published = Model?.Count(o => o.IsActive) ?? 0;
+    var pending = total - published;
+    var hasItems = Model?.Any() ?? false;
+}
+
+@section Styles{
+    <link rel="stylesheet" href="~/css/supplier-products.css" />
+}
+
+<div class="supplier-dashboard">
+    <div class="supplier-hero rounded-4 text-white p-4 p-md-5 mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <p class="text-uppercase small text-white-50 mb-1">منطقة المورد</p>
+                <h1 class="h2 fw-bold mb-3">أدر منتجاتك باحترافية</h1>
+                <p class="text-white-75 mb-4">ارفع منتجاتك مع الصور والتفاصيل الكاملة، وانشرها للعامة بضغطة زر. تابع حالة النشر والمخزون والأداء من مكان واحد.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-light rounded-pill px-4" asp-action="Create">
+                        <i class="fas fa-plus me-2"></i>إضافة منتج جديد
+                    </a>
+                    <a class="btn btn-outline-light rounded-pill px-4" asp-area="Supplier" asp-controller="Reports" asp-action="Earnings">
+                        تقارير الأرباح
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 mt-4 mt-lg-0">
+                <div class="hero-quick-stats rounded-4 p-4">
+                    <div>
+                        <p class="text-uppercase text-white-50 small mb-1">إجمالي المنتجات</p>
+                        <h3 class="mb-0">@total</h3>
+                    </div>
+                    <div>
+                        <p class="text-uppercase text-white-50 small mb-1">منتجات منشورة</p>
+                        <h3 class="mb-0 text-success">@published</h3>
+                    </div>
+                    <div>
+                        <p class="text-uppercase text-white-50 small mb-1">مسودات</p>
+                        <h3 class="mb-0 text-warning">@pending</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-glow hero-glow-1"></div>
+        <div class="hero-glow hero-glow-2"></div>
+    </div>
+
+    <div class="products-grid">
+        @if (!hasItems)
+        {
+            <div class="empty-state text-center py-5">
+                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <h5 class="mb-2">لم تقم بإضافة أي منتج بعد</h5>
+                <p class="text-muted mb-4">ابدأ برفع أول منتج لك مع الصور والتفاصيل، وسيظهر فوراً في المتجر بعد النشر.</p>
+                <a class="btn btn-primary rounded-pill px-4" asp-action="Create">إضافة منتج</a>
+            </div>
+        }
+        else
+        {
+            var offersList = Model ?? Enumerable.Empty<Rain.Domain.Entities.SupplierOffer>();
+            <div class="row g-4">
+                @foreach (var offer in offersList)
+                {
+                    var img = offer.Product?.Images?.FirstOrDefault()?.Url ?? "/images/logo.png";
+                    <div class="col-12 col-md-6 col-xl-4">
+                        <div class="supplier-product-card rounded-4 shadow-sm h-100 d-flex flex-column">
+                            <div class="product-media position-relative overflow-hidden rounded-4">
+                                <img src="@img" alt="@offer.Product?.Name" class="w-100 h-100 object-fit-cover" />
+                                <span class="status-badge @(offer.IsActive ? "published" : "draft")">
+                                    @(offer.IsActive ? "منشور" : "مسودة")
+                                </span>
+                            </div>
+                            <div class="product-body flex-grow-1 p-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <div>
+                                        <h5 class="mb-1">@offer.Product?.Name</h5>
+                                        <p class="text-muted small mb-0">@offer.Product?.SellerName ?? "—"</p>
+                                    </div>
+                                    <div class="text-end">
+                                        <p class="text-muted small mb-1">السعر</p>
+                                        <div class="fw-bold">@offer.Price.ToString("0.00") @offer.Currency</div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2 small text-muted mb-3">
+                                    <span><i class="fas fa-warehouse me-1"></i>المخزون: @offer.StockQty</span>
+                                    <span><i class="fas fa-layer-group me-1"></i>حد الشراء: @offer.MinOrderQty</span>
+                                </div>
+                                <p class="text-muted small line-clamp-2">@offer.Product?.Description</p>
+                            </div>
+                            <div class="product-actions p-3 border-top d-flex flex-wrap gap-2">
+                                <form asp-action="Publish" method="post" class="flex-grow-1">
+                                    <input type="hidden" name="id" value="@offer.Id" />
+                                    <button type="submit" class="btn btn-sm w-100 @(offer.IsActive ? "btn-secondary" : "btn-success")" @(offer.IsActive ? "disabled" : "")>
+                                        <i class="fas fa-broadcast-tower me-1"></i>@(offer.IsActive ? "منشور" : "نشر الآن")
+                                    </button>
+                                </form>
+                                <a class="btn btn-sm btn-outline-primary flex-grow-1" asp-action="Edit" asp-route-id="@offer.Id">
+                                    <i class="fas fa-edit me-1"></i>تعديل
+                                </a>
+                                <a class="btn btn-sm btn-outline-danger flex-grow-0" asp-action="Delete" asp-route-id="@offer.Id">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

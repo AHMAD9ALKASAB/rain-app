@@ -1,0 +1,66 @@
+@using Rain.Domain.Entities
+@model Product
+@{
+    ViewData["Title"] = "تعديل منتج";
+}
+<div class="container py-3">
+    <h3 class="mb-3">تعديل منتج</h3>
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <div class="mb-3">
+            <label class="form-label">الاسم</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <label class="form-label">الفئة</label>
+                <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories"></select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">الماركة</label>
+                <select asp-for="BrandId" class="form-select" asp-items="ViewBag.Brands"></select>
+            </div>
+        </div>
+        <div class="mb-3 mt-2">
+            <label class="form-label">الوصف</label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+        </div>
+        <div>
+            <button class="btn btn-primary">حفظ</button>
+            <a class="btn btn-secondary" href="@Url.Action("Index")">رجوع</a>
+        </div>
+    </form>
+
+    <hr />
+
+    <h5 class="mb-2">صور المنتج</h5>
+    <div class="text-danger">
+        @Html.ValidationSummary(false)
+    </div>
+    <form method="post" asp-action="UploadImage" asp-route-id="@Model.Id" enctype="multipart/form-data" class="mb-3">
+        @Html.AntiForgeryToken()
+        <input type="file" name="file" accept="image/*" class="form-control" />
+        <button class="btn btn-outline-primary mt-2">رفع صورة</button>
+    </form>
+
+    <div class="row g-2">
+        @foreach (var img in Model.Images ?? new List<ProductImage>())
+        {
+            <div class="col-6 col-md-3">
+                <div class="card">
+                    <img src="@img.Url" class="card-img-top" alt="image" />
+                    <div class="card-body p-2 text-center">
+                        <form method="post" asp-action="DeleteImage" asp-route-id="@img.Id">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-outline-danger">حذف</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

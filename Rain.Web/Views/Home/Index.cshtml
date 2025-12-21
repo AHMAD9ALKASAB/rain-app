@@ -1,0 +1,462 @@
+@{
+    var culture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    var isAr = culture == "ar";
+    ViewData["Title"] = isAr ? "الصفحة الرئيسية" : "Home";
+}
+
+<section class="py-5 hero home-section position-relative overflow-hidden">
+    <canvas id="heroBg" class="hero-bg position-absolute top-0 start-0 w-100 h-100"></canvas>
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-6 order-2 order-lg-1">
+                <h1 class="display-5 fw-bold mb-3">
+                    <span class="brand-gradient-force">@(isAr ? "منصّة رين للتجارة المتبادلة" : "RAIN Commerce Platform")</span>
+                </h1>
+                <div class="lead emphasis text-stroke mb-4">
+                    @if (isAr)
+                    {
+                        <div class="mb-1">منصّة تجارة و تسويق إلكتروني متعددة الحسابات :</div>
+                        <div class="mb-1">" فرد (مفرق) " تسوّق وقم بتلبية احتياجاتك بمنتهى السهولة</div>
+                        <div class="mb-1">" محل (جملة) " أسعار خاصة لأصحاب المحلات والمشاريع الصغيرة</div>
+                        <div>" موّرد / شركة " قم بعرض منتجاتك الأن من أيّ مكان في العالم !</div>
+                    }
+                    else
+                    {
+                        <div class="mb-1">Multi‑account commerce & marketing:</div>
+                        <div class="mb-1">“Individual (Retail)” shop easily and meet your needs</div>
+                        <div class="mb-1">“Shop (Wholesale)” special pricing for shops and small businesses</div>
+                        <div>“Supplier/Company” list your products from anywhere in the world!</div>
+                    }
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-primary btn-lg" asp-controller="Products" asp-action="Index">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="ms-1"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+                        @(isAr ? "استكشف المنتجات" : "Browse Products")
+                    </a>
+                    <a class="btn btn-outline-primary btn-lg" asp-area="Identity" asp-page="/Account/RegisterIndividual">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="ms-1"><path d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5zm0 2c-4.418 0-8 2.239-8 5v3h16v-3c0-2.761-3.582-5-8-5z"/></svg>
+                        @(isAr ? "تسجيل فرد" : "Register Individual")
+                    </a>
+                    <a class="btn btn-outline-success btn-lg" asp-area="Identity" asp-page="/Account/RegisterShop">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="ms-1"><path d="M3 9l1-4h16l1 4H3zm1 2h16v9H4v-9zm3 2v5h2v-5H7zm4 0v5h2v-5h-2zM5 3h14v2H5V3z"/></svg>
+                        @(isAr ? "تسجيل محل" : "Register Shop")
+                    </a>
+                    <a class="btn btn-outline-warning btn-lg" asp-area="Identity" asp-page="/Account/RegisterSupplier">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="ms-1"><path d="M3 3h13v6H3V3zm0 8h18v10H3V11zm15-3l3 3V3h-3v5z"/></svg>
+                        @(isAr ? "تسجيل موّرد / شركة" : "Register Supplier")
+                    </a>
+                    <a class="btn btn-link btn-lg" asp-area="Identity" asp-page="/Account/Login">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="ms-1"><path d="M10 17l5-5-5-5v3H3v4h7v3zM13 3h8v18h-8v-2h6V5h-6V3z"/></svg>
+                        @(isAr ? "تسجيل الدخول" : "Sign In")
+                    </a>
+                </div>
+                <div class="mt-4 subhead-lg brand-strong text-stroke">
+                    @(isAr ? "شراء / بيع سهل , تسويق ذكي , مدفوعات آمنة، تأكيد بريد، وويب هوكس مُؤمّنة" : "Easy buy/sell, smart marketing, secure payments, email confirmation, secured webhooks")
+                </div>
+            </div>
+            <div class="col-lg-6 text-center order-1 order-lg-2 reveal">
+                <span class="hero-logo-glow d-inline-block mb-3">
+                    <img src="/images/logo.png" alt="RAIN" class="img-fluid" style="max-height:320px">
+                </span>
+                <div class="cube-scene mt-2">
+                    <div class="cube" id="rainCube">
+                        <div class="cube__face cube__face--front">@(isAr?"مناسب للمحلات والأفراد":"For Shops & Individuals")</div>
+                        <div class="cube__face cube__face--back">@(isAr?"ثقة و أمان":"Trust & Security")</div>
+                        <div class="cube__face cube__face--right">@(isAr?"سرعة و مرونة":"Speed & Flexibility")</div>
+                        <div class="cube__face cube__face--left">@(isAr?"مناسب للشركات":"For Business")</div>
+                        <div class="cube__face cube__face--top">@(isAr?"منصّة رين":"RAIN Platform")</div>
+                        <div class="cube__face cube__face--bottom">@(isAr?"تجارة ذكيّة":"Smart Commerce")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="my-5" />
+    <div class="container py-3">
+        <div class="row g-4">
+            <div class="col-md-4 reveal">
+                <div class="card feature-card h-100 p-3">
+                    <h5 class="fw-semibold brand-strong text-stroke d-flex align-items-center gap-2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l1.76 3.56L17.7 7.2l-2.7 2.63.64 3.77L12 12.9 8.36 13.6l.64-3.77L6.3 7.2l3.94-.64L12 3z" fill="currentColor"/></svg>
+                        @(isAr ? "مدفوعات Stripe" : "Stripe Payments")
+                    </h5>
+                    <p class="text-muted mb-0 emphasis text-stroke">@(isAr ? "خروج آمن مع Webhooks مؤمّنة وحالات الدفع الكاملة (نجاح/فشل/استرداد)." : "Secure Checkout with verified webhooks and full payment lifecycle (success/fail/refund).")</p>
+                </div>
+            </div>
+            <div class="col-md-4 reveal">
+                <div class="card feature-card h-100 p-3">
+                    <h5 class="fw-semibold brand-strong text-stroke d-flex align-items-center gap-2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6H4v12h16V6zm-8 5L4.5 7.5h15L12 11z" fill="currentColor"/></svg>
+                        @(isAr ? "البريد والإشعارات" : "Emails & Notifications")
+                    </h5>
+                    <p class="text-muted mb-0 emphasis text-stroke">@(isAr ? "قوالب بريد HTML بعلامتك، تأكيد بريد، وإشعارات لحالات الطلب والدفع." : "Branded HTML emails, email confirmation, and order/payment notifications.")</p>
+                </div>
+            </div>
+            <div class="col-md-4 reveal">
+                <div class="card feature-card h-100 p-3">
+                    <h5 class="fw-semibold brand-strong text-stroke d-flex align-items-center gap-2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 17.93V4.07A8 8 0 0119.93 11H13v8.93zM11 19.93A8 8 0 014.07 13H11v6.93zM4.07 11A8 8 0 0111 4.07V11H4.07z" fill="currentColor"/></svg>
+                        @(isAr ? "تعدد اللغات والأمن" : "i18n & Security")
+                    </h5>
+                    <p class="text-muted mb-0 emphasis text-stroke">@(isAr ? "عربي/إنجليزي، سياسات آمنة، رؤوس حماية، وتبديل مظهر فاتح/داكن." : "Arabic/English, hardened policies, security headers, and light/dark themes.")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 home-section">
+    <div class="container">
+        <h3 class="fw-bold text-center mb-4 brand-strong text-stroke">@(isAr ? "اختر نوع حسابك" : "Choose Your Account Type")</h3>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 p-3 border-0 shadow-sm" style="--ring:#0ea5e9">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="m-0 fw-bold brand-strong">@(isAr?"فرد ( مناسب للجميع )":"Individual (For Everyone)")</h5>
+                        <span class="icon-badge" style="background:rgba(14,165,233,.12);color:#0284c7">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.8 0 5-2.2 5-5s-2.2-5-5-5-5 2.2-5 5 2.2 5 5 5zm0 2c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5z"/></svg>
+                        </span>
+                    </div>
+                    <p class="text-muted">@(isAr?"تسوّق بسرعة وببساطة وتمتّع بالحريّة والأمان والمقارنة بين المنتجات.":"Shop fast and simple and enjoy freedom, security, and product comparison.")</p>
+                    <ul class="mb-3 small text-muted">
+                        <li>@(isAr?"سلة سلسة ودفع آمن.":"Smooth cart and secure checkout.")</li>
+                        <li>@(isAr?"تاريخ طلبات وإشعارات فورية.":"Order history and instant notifications.")</li>
+                        <li>@(isAr?"تجربة عربية بالكامل ودعم فني.":"Full Arabic UX with support.")</li>
+                    </ul>
+                    <a class="btn btn-outline-primary w-100" asp-area="Identity" asp-page="/Account/RegisterIndividual">@(isAr?"ابدأ كفرد":"Start as Individual")</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-3 border-0 shadow-sm" style="--ring:#16a34a">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="m-0 fw-bold brand-strong">@(isAr?"محل / تاجر ( جملة )":"Shop / Merchant (Wholesale)")</h5>
+                        <span class="icon-badge" style="background:rgba(34,197,94,.12);color:#15803d">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9l1-4h16l1 4H3zm1 2h16v9H4v-9zm3 2v5h2v-5H7zm4 0v5h2v-5h-2zM5 3h14v2H5V3z"/></svg>
+                        </span>
+                    </div>
+                    <p class="text-muted">@(isAr?"احصل على سعر جملة و أسعار مميزة تلقائياً عند شراء 50+ قطعة في الطلب الواحد.":"Get wholesale and special pricing automatically when buying 50+ units per order.")</p>
+                    <ul class="mb-3 small text-muted">
+                        <li>@(isAr?"فواتير واضحة وإدارة عناوين الشحن.":"Clear invoicing and shipping addresses management.")</li>
+                        <li>@(isAr?"تتبّع الطلبات وإشعارات حالة التسليم.":"Order tracking and delivery notifications.")</li>
+                        <li>@(isAr?"دعم لاحتياجات التجار.":"Support for shop needs.")</li>
+                    </ul>
+                    <a class="btn btn-outline-success w-100" asp-area="Identity" asp-page="/Account/RegisterShop">@(isAr?"ابدأ كتاجر جملة":"Start as Shop")</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-3 border-0 shadow-sm" style="--ring:#d97706">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h5 class="m-0 fw-bold brand-strong">@(isAr?"موّرد /  شركة":"Supplier / Company")</h5>
+                        <span class="icon-badge" style="background:rgba(245,158,11,.12);color:#b45309">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h13v6H3V3zm0 8h18v10H3V11zm15-3l3 3V3h-3v5zM6 14h5v5H6v-5zm7 0h5v5h-5v-5z"/></svg>
+                        </span>
+                    </div>
+                    <p class="text-muted">@(isAr?"قدّم طلب اعتماد وانشر عروضك ومنتجاتك بنفسك مع خطط اشتراك تناسب الجميع.":"Apply for approval and publish your offers and products with subscription plans for everyone.")</p>
+                    <ul class="mb-3 small text-muted">
+                        <li>@(isAr?"إدارة منتجات وعروض ونشر/إلغاء نشر.":"Manage products, offers, publish/unpublish.")</li>
+                        <li>@(isAr?"قيود حذف عند وجود مشتريات لضمان الثقة.":"Delete restrictions when purchased to ensure trust.")</li>
+                        <li>@(isAr?"تقارير أرباح مع تصفية وتصدير CSV.":"Earnings reports with filters and CSV export.")</li>
+                    </ul>
+                    <a class="btn btn-outline-warning w-100" asp-area="Identity" asp-page="/Account/RegisterSupplier">@(isAr?"ابدأ كمورد":"Start as Supplier")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+ </section>
+
+ <section class="py-5 home-section">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-7">
+                <h3 class="fw-bold mb-3"><span class="brand-gradient-force">@(isAr?"فكرة المنصّة وكيف تستفيد بأقصى قدر":"The Idea & How to Maximize Your Gains")</span></h3>
+                @if (isAr)
+                {
+                    <p class="text-muted mb-1">رين ليست مجرّد متجر عادي ! إنها منصّة تَجمع بين الشراء الذكي والبيع الذكي.</p>
+                    <p class="text-muted">اختر نوع الحساب المناسب , وانطلق في تحقيق هدفك :</p>
+                }
+                else
+                {
+                    <p class="text-muted mb-1">RAIN isn’t just a regular store! It blends smart buying with smart selling.</p>
+                    <p class="text-muted">Choose your account, and pursue your goal:</p>
+                }
+                <ul class="mb-3">
+                    <li>@(isAr?"كفرد: اختر منتجاتك بسهولة، ادفع بأمان، واستلم إشعارات لحظية.":"As Individual: pick easily, pay securely, get real-time notifications.")</li>
+                    <li>@(isAr?"كمحل: كوّن سلة جملة (50+) لتحصل على أفضل سعر تلقائياً.":"As Shop: build 50+ unit carts to unlock best wholesale pricing.")</li>
+                    <li>@(isAr?"كمورد: انشر عروضك، راقب أرباحك، واصنع حضورك.":"As Supplier: publish offers, track earnings, build your presence.")</li>
+                </ul>
+                <div class="small text-muted">@(isAr?"نصنع تجربة خارجة عن المألوف: تصميم عربي، حماية متقدمة، وتدفق واضح لتحقيق أعلى إفادة في الشراء والبيع والنشر.":"We craft an out‑of‑the‑box experience: Arabic design, advanced protection, and a clear flow to maximize buying, selling, and publishing.")</div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card p-3 border-0 shadow-sm">
+                    <h5 class="fw-bold mb-2 brand-strong">@(isAr?"ابدأ من هنا":"Start Here")</h5>
+                    <ol class="small mb-3 text-muted">
+                        <li>@(isAr?"اختر نوع الحساب المناسب.":"Choose your account type.")</li>
+                        <li>@(isAr?"أكمل التسجيل وفعّل بريدك.":"Complete signup and confirm your email.")</li>
+                        <li>@(isAr?"استكشف المنتجات أو قدّم طلب اعتماد كمورد.":"Browse products or apply as a supplier.")</li>
+                        <li>@(isAr?"تابع الإشعارات والتقارير لتحقيق أهدافك.":"Follow notifications and reports to hit your goals.")</li>
+                    </ol>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-primary" asp-controller="Products" asp-action="Index">@(isAr?"استكشف المنتجات":"Browse Products")</a>
+                        <a class="btn btn-outline-primary" asp-area="Identity" asp-page="/Account/RegisterIndividual">@(isAr?"تسجيل فرد":"Register Individual")</a>
+                        <a class="btn btn-outline-success" asp-area="Identity" asp-page="/Account/RegisterShop">@(isAr?"تسجيل محل":"Register Shop")</a>
+                        <a class="btn btn-outline-warning" asp-area="Identity" asp-page="/Account/RegisterSupplier">@(isAr?"تسجيل موّرد / شركة":"Register Supplier")</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+ </section>
+
+<section class="py-5 home-section">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7 reveal">
+                <h3 class="fw-bold mb-2">@(isAr ? "حلول للشركات والمؤسسات" : "Solutions for Businesses")</h3>
+                <p class="text-muted mb-0">@(isAr ? "أخبرنا باحتياجاتك لنقترح عليك تجربة مخصّصة ودمجاً سريعاً." : "Tell us your needs and we’ll propose a tailored experience with rapid integration.")</p>
+            </div>
+            <div class="col-lg-5">
+                <form asp-action="ContactLead" method="post" class="card p-3 reveal">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-2">
+                        <input name="Name" class="form-control" placeholder="@(isAr?"الاسم":"Name")" required />
+                    </div>
+                    <div class="mb-2">
+                        <input name="Email" type="email" class="form-control" placeholder="Email" required />
+                    </div>
+                    <div class="mb-2">
+                        <input name="Company" class="form-control" placeholder="@(isAr?"الشركة (اختياري)":"Company (optional)")" />
+                    </div>
+                    <div class="mb-3">
+                        <textarea name="Message" class="form-control" rows="3" placeholder="@(isAr?"رسالتك":"Your message")" required></textarea>
+                        <div class="form-text brand-strong">@(isAr?"نحن نحترم خصوصيتك ولن نشارك بياناتك.":"We respect your privacy and won’t share your data.")</div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="py-5 home-section" id="assistant">
+    <div class="container">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-5">
+                <div class="card chatbot-card h-100" data-chatbot-root>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <div class="badge rounded-pill text-bg-primary px-3 py-2">@(isAr ? "مساعد رين الذكي" : "RAIN Smart Assistant")</div>
+                            <div class="small text-muted mt-1">@(isAr ? "متاح 24/7 للرد على أسئلتك الفورية." : "Available 24/7 for instant replies.")</div>
+                        </div>
+                        <div class="chatbot-status">
+                            <span class="status-dot"></span>
+                            <span class="small">@(isAr ? "متصل الآن" : "Online")</span>
+                        </div>
+                    </div>
+                    <div class="chatbot-thread" data-chatbot-thread>
+                        <div class="chatbot-bubble chatbot-bubble--bot">
+                            <p class="mb-1 fw-semibold">@(isAr ? "أهلًا بك 👋" : "Welcome 👋")</p>
+                            <p class="mb-0 small">@(
+                                isAr
+                                    ? "اسألني عن التسجيل، الدفع، أو كيفية اختيار نوع الحساب."
+                                    : "Ask me about onboarding, payments, or choosing your account type."
+                            )</p>
+                        </div>
+                    </div>
+                    <div class="chatbot-quick mt-3 mb-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-chatbot-question="@(isAr ? "كيف أفتح حساب مورد؟" : "How do I become a supplier?")">
+                            @(isAr ? "التسجيل كمورد" : "Supplier Sign-up")
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-chatbot-question="@(isAr ? "هل Stripe آمن للمدفوعات؟" : "Is Stripe secure?")">
+                            @(isAr ? "أمان المدفوعات" : "Payment Security")
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-chatbot-question="@(isAr ? "ما الفرق بين فرد ومحل؟" : "Difference between individual and shop?")">
+                            @(isAr ? "أنواع الحسابات" : "Account Types")
+                        </button>
+                    </div>
+                    <form class="chatbot-input" data-chatbot-form>
+                        <input type="text" class="form-control" data-chatbot-input placeholder="@(isAr ? "اكتب سؤالك هنا..." : "Type your question...")" required />
+                        <button type="submit" class="btn btn-primary">
+                            <span>@(isAr ? "إرسال" : "Send")</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="card h-100 p-4 faq-card">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="badge bg-light text-dark">@(
+                            isAr ? "تعرّف بسرعة" : "Quick Answers"
+                        )</span>
+                        <h4 class="m-0 fw-bold">@(isAr ? "أسئلة شائعة" : "Frequently Asked Questions")</h4>
+                    </div>
+                    <p class="text-muted mb-4">@(
+                        isAr
+                            ? "اخترنا لك أبرز الأسئلة حول الحسابات، الدفع، والاعتمادات."
+                            : "Hand-picked answers about accounts, payments, and onboarding."
+                    )</p>
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqOneHeading">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne" aria-expanded="true" aria-controls="faqOne">
+                                    @(isAr ? "ما هي أنواع الحسابات المتاحة؟" : "Which account types are available?")
+                                </button>
+                            </h2>
+                            <div id="faqOne" class="accordion-collapse collapse show" aria-labelledby="faqOneHeading" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    @(isAr
+                                        ? "يمكنك التسجيل كفرد للشراء، كمحل للحصول على أسعار جملة، أو كمورد/شركة لعرض منتجاتك."
+                                        : "Register as an Individual to buy, as a Shop for wholesale prices, or as a Supplier to publish offers.")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqTwoHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqTwo" aria-expanded="false" aria-controls="faqTwo">
+                                    @(isAr ? "كيف تتم حماية المدفوعات؟" : "How are payments secured?")
+                                </button>
+                            </h2>
+                            <div id="faqTwo" class="accordion-collapse collapse" aria-labelledby="faqTwoHeading" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    @(isAr
+                                        ? "نستخدم Stripe ببوابات محمية، تشفير TLS، وتحقق من التواقيع عبر Webhooks لضمان دورات دفع آمنة."
+                                        : "We rely on Stripe with hardened webhooks, TLS encryption, and signature checks for each payment cycle.")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqThreeHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqThree" aria-expanded="false" aria-controls="faqThree">
+                                    @(isAr ? "ما هي خطوات اعتماد المورد؟" : "What are the supplier approval steps?")
+                                </button>
+                            </h2>
+                            <div id="faqThree" class="accordion-collapse collapse" aria-labelledby="faqThreeHeading" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    @(isAr
+                                        ? "قدّم طلب الاعتماد، حمّل بياناتك التجارية، انتظر المراجعة، ثم ابدأ بنشر المنتجات وإدارة العروض."
+                                        : "Submit your application, provide business details, wait for review, then start publishing products and offers.")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="faqFourHeading">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFour" aria-expanded="false" aria-controls="faqFour">
+                                    @(isAr ? "هل أستطيع إدارة طلبي ومتابعته؟" : "Can I manage and track my orders?")
+                                </button>
+                            </h2>
+                            <div id="faqFour" class="accordion-collapse collapse" aria-labelledby="faqFourHeading" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    @(isAr
+                                        ? "نعم، كل حساب يحصل على لوحة تتبّع للطلبات، الإشعارات، وحالة الشحن لحظة بلحظة."
+                                        : "Yes, every account gets order tracking, notifications, and live shipping statuses.")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <h2 class="fw-bold mb-3 contrast-title">@(isAr ? "نثق بالجودة ونلتزم بالأمان" : "We trust in quality and commit to security")</h2>
+                <p class="lead mb-0 emphasis text-stroke brand-strong">
+                    @(isAr ? "رين يجمع بين تجربة تسوق رائعة وبنية تقنية موثوقة: تشفير، تحقق بريد إلكتروني، وإدارة مدفوعات احترافية." : "RAIN blends delightful shopping with robust tech: encryption, email confirmation, and professional payment handling.")
+                </p>
+            <div class="col-lg-5">
+                <div class="row text-center g-3">
+                    <div class="col-6">
+                        <div class="card stat-card p-3 h-100">
+                            <div class="h3 fw-bold mb-0">99.9%</div>
+                            <div class="text-muted">@(isAr ? "جاهزية" : "Uptime")</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card stat-card p-3 h-100">
+                            <div class="h3 fw-bold mb-0">PCI‑Ready</div>
+                            <div class="text-muted">@(isAr ? "بوابات دفع" : "Payment gateways")</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 home-section">
+    <div class="container">
+        <h3 class="fw-bold text-center mb-4 brand-strong text-stroke">@(isAr ? "موثوقية ومعايير" : "Trust & Compliance")</h3>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 p-3 reveal">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                        <span class="fw-semibold">PCI DSS</span>
+                    </div>
+                    <p class="mb-0">@(isAr ? "جاهزية امتثال بوابات الدفع لمعايير PCI." : "Payment gateways prepared for PCI compliance.")</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-3 reveal">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l9 4v6c0 5-4 8-9 10C7 20 3 17 3 12V6l9-4z" fill="currentColor"/></svg>
+                        <span class="fw-semibold">SSL/TLS</span>
+                    </div>
+                    <p class="mb-0">@(isAr ? "قنوات اتصال مؤمنة بشهادات حديثة." : "Secure transport with modern certificates.")</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-3 reveal">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12h16M4 6h16M4 18h10" stroke="currentColor" stroke-width="2"/></svg>
+                        <span class="fw-semibold">Webhooks</span>
+                    </div>
+                    <p class="mb-0">@(isAr ? "ويب هوكس مؤمنة وتحقق من التواقيع." : "Signed and verified webhooks.")</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-3 reveal">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 20a8 8 0 100-16 8 8 0 000 16z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                        <span class="fw-semibold">99.9% Uptime</span>
+                    </div>
+                    <p class="mb-0">@(isAr ? "جاهزية عالية وخدمات رصد." : "High availability with monitoring.")</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-3 reveal">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M5 16h10M5 8h14" stroke="currentColor" stroke-width="2"/></svg>
+                        <span class="fw-semibold">Privacy</span>
+                    </div>
+                    <p class="mb-0">@(isAr ? "حماية بيانات وتشفير على مستوى النظام." : "Data protection and system-wide encryption.")</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-3 reveal">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l4 8h8l-6 4 2 8-8-5-8 5 2-8-6-4h8l4-8z" fill="currentColor"/></svg>
+                        <span class="fw-semibold">Stripe</span>
+                    </div>
+                    <p class="mb-0">@(isAr ? "تكامل مع Stripe وإدارة دورة الدفع." : "Stripe integration and full payment lifecycle.")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <h3 class="fw-bold text-center mb-4 brand-strong text-stroke">@(isAr ? "يثق بنا شركاء" : "Trusted by partners")</h3>
+        <div class="d-flex flex-wrap justify-content-center gap-4 opacity-75">
+            <img src="/images/logo.png" alt="RAIN" height="36"/>
+            <span class="h5 m-0">Stripe</span>
+            <span class="h5 m-0">SMTP</span>
+            <span class="h5 m-0">.NET</span>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/chatbot.js" asp-append-version="true"></script>
+}

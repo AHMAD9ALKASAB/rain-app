@@ -1,0 +1,62 @@
+@model Rain.Web.Areas.Supplier.Controllers.MyProductsController.CreateVm
+@{
+  ViewData["Title"] = "إضافة منتج جديد";
+}
+<h1 class="mb-3">إضافة منتج جديد</h1>
+<form asp-action="Create" method="post" enctype="multipart/form-data" class="card p-3">
+  @Html.AntiForgeryToken()
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">صورة المنتج (اختياري)</label>
+      <input type="file" asp-for="Image" class="form-control" accept="image/png,image/jpeg,image/webp" />
+      <span asp-validation-for="Image" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">الاسم المختصر</label>
+      <input asp-for="Name" class="form-control" />
+      <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">اسم البائع/الشركة (اختياري)</label>
+      <input asp-for="SellerName" class="form-control" />
+      <span asp-validation-for="SellerName" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">السعر</label>
+      <input asp-for="Price" class="form-control" />
+      <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">العملة</label>
+      <select asp-for="Currency" class="form-select">
+        @foreach (var c in (string[])ViewBag.Currencies)
+        {
+          <option value="@c">@c</option>
+        }
+      </select>
+      <span asp-validation-for="Currency" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">المخزون</label>
+      <input asp-for="StockQty" class="form-control" />
+      <span asp-validation-for="StockQty" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">حد الشراء (افتراضي 1)</label>
+      <input asp-for="MinOrderQty" class="form-control" />
+      <span asp-validation-for="MinOrderQty" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+      <label class="form-label">وصف المنتج</label>
+      <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+      <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+  </div>
+  <div class="mt-3 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">حفظ</button>
+    <a asp-action="Index" class="btn btn-outline-secondary" onclick="return confirm('هل أنت متأكد من الإلغاء؟ سيتم فقدان المعلومات الحالية.');">إلغاء</a>
+  </div>
+</form>
+@section Scripts{
+  <partial name="_ValidationScriptsPartial" />
+}

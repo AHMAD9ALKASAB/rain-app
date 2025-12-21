@@ -1,0 +1,85 @@
+@using Rain.Domain.Entities
+@model IEnumerable<OrderItem>
+@{
+    ViewData["Title"] = "أرباحي وصافي المستحق";
+    var gross = (decimal)(ViewBag.TotalGross ?? 0m);
+    var comm = (decimal)(ViewBag.TotalCommission ?? 0m);
+    var net = (decimal)(ViewBag.TotalNet ?? 0m);
+    string from = ViewBag.From as string ?? string.Empty;
+    string to = ViewBag.To as string ?? string.Empty;
+    int? productId = ViewBag.ProductId as int?;
+}
+<h1 class="mb-3">أرباحي وصافي المستحق</h1>
+
+<form method="get" class="card card-body mb-3">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label">من تاريخ</label>
+      <input type="date" name="from" class="form-control" value="@from" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">إلى تاريخ</label>
+      <input type="date" name="to" class="form-control" value="@to" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">المنتج</label>
+      <select name="productId" class="form-select">
+        <option value="">كل المنتجات</option>
+        @foreach (var p in (Microsoft.AspNetCore.Mvc.Rendering.SelectList)ViewBag.Products)
+        {
+          var sel = (productId.HasValue && productId.Value.ToString() == p.Value) ? "selected" : null;
+          <option value="@p.Value" selected="@sel">@p.Text</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-primary flex-fill">تطبيق</button>
+      <a class="btn btn-outline-secondary" href="@Url.Action("Earnings")">تفريغ</a>
+    </div>
+  </div>
+  <div class="mt-2">
+    <a class="btn btn-sm btn-success" href="@Url.Action("ExportEarningsCsv", new { from = from, to = to, productId = productId })">تنزيل CSV</a>
+  </div>
+  </form>
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card text-bg-light"><div class="card-body"><div class="fw-semibold">إجمالي المبيعات</div><div class="fs-4">@gross.ToString("0.00")</div></div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-light"><div class="card-body"><div class="fw-semibold">عمولة الموقع</div><div class="fs-4">@comm.ToString("0.00")</div></div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-light"><div class="card-body"><div class="fw-semibold">الصافي لك</div><div class="fs-4">@net.ToString("0.00")</div></div></div>
+  </div>
+</div>
+<div class="table-responsive">
+  <table class="table table-striped align-middle">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>المنتج</th>
+        <th>الكمية</th>
+        <th>سعر الوحدة</th>
+        <th>الإجمالي</th>
+        <th>العمولة</th>
+        <th>الصافي</th>
+        <th>الطلب</th>
+      </tr>
+    </thead>
+    <tbody>
+    @foreach (var i in Model)
+    {
+      <tr>
+        <td>@i.Id</td>
+        <td>@i.SupplierOffer?.Product?.Name</td>
+        <td>@i.Quantity</td>
+        <td>@i.UnitPrice.ToString("0.00")</td>
+        <td>@i.LineTotal.ToString("0.00")</td>
+        <td>@i.CommissionAmount.ToString("0.00")</td>
+        <td>@i.NetToSupplier.ToString("0.00")</td>
+        <td>@i.OrderId</td>
+      </tr>
+    }
+    </tbody>
+  </table>
+</div>

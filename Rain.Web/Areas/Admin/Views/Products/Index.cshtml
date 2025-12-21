@@ -1,0 +1,43 @@
+@using Rain.Domain.Entities
+@model List<Product>
+@{
+    ViewData["Title"] = "إدارة المنتجات";
+}
+<div class="container py-3">
+    <h3 class="mb-3">إدارة المنتجات</h3>
+    <div class="d-flex justify-content-between mb-2">
+        <form class="d-flex" method="get">
+            <input class="form-control me-2" name="keyword" placeholder="بحث بالاسم" value="@Context.Request.Query["keyword"]" />
+            <button class="btn btn-outline-primary">بحث</button>
+        </form>
+        <a class="btn btn-primary" href="@Url.Action("Create")">إضافة منتج</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>الاسم</th>
+                    <th>الفئة</th>
+                    <th>الماركة</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.Id</td>
+                    <td>@p.Name</td>
+                    <td>@p.Category?.Name</td>
+                    <td>@p.Brand?.Name</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary" href="@Url.Action("Edit", new { id = p.Id })">تعديل</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

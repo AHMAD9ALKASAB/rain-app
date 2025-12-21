@@ -1,0 +1,61 @@
+@using Microsoft.AspNetCore.Identity
+@using Rain.Infrastructure.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Rain.Web.SharedResource> L
+
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+    var emailConfirmed = currentUser != null && await UserManager.IsEmailConfirmedAsync(currentUser);
+}
+
+<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+        <span class="nav-link text-dark">@User.Identity?.Name</span>
+    </li>
+    @if (await UserManager.IsInRoleAsync(currentUser!, "Supplier"))
+    {
+        <li class="nav-item">
+            <a class="btn btn-sm btn-outline-secondary me-2" asp-area="Identity" asp-page="/Account/Manage/ChangePassword">@L["ChangePassword"]</a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-sm btn-outline-primary me-2" asp-area="Supplier" asp-controller="Reports" asp-action="Earnings">تقارير الأرباح</a>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="btn btn-sm btn-outline-secondary me-2" asp-area="Identity" asp-page="/Account/Manage/Index">@L["Account"]</a>
+        </li>
+    }
+    @if (!emailConfirmed)
+    {
+        <li class="nav-item me-2">
+            <form class="form-inline" method="post" asp-controller="Account" asp-action="ResendEmailConfirmation">
+                <button type="submit" class="btn btn-sm btn-outline-warning">@L["ResendConfirmation"]</button>
+            </form>
+        </li>
+    }
+    <li class="nav-item">
+        <form class="form-inline" method="post" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index","Home", new { area = "" })">
+            <button type="submit" class="btn btn-sm btn-outline-danger">@L["Logout"]</button>
+        </form>
+    </li>
+}
+else
+{
+    <li class="nav-item">
+        <a class="btn btn-sm btn-outline-primary me-2" asp-area="Identity" asp-page="/Account/Login">@L["Login"]</a>
+    </li>
+    <li class="nav-item dropdown">
+        <a class="btn btn-sm btn-primary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">إنشاء حساب</a>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/RegisterIndividual">فرد (مفرق)</a></li>
+            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/RegisterShop">محل (جملة)</a></li>
+            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/RegisterSupplier">مورد/شركة</a></li>
+        </ul>
+    </li>
+}
+</ul>

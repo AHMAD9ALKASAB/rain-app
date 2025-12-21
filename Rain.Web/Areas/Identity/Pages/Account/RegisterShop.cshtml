@@ -1,0 +1,235 @@
+@page
+@model Rain.Web.Areas.Identity.Pages.Account.RegisterShopModel
+@{
+    ViewData["Title"] = "إنشاء حساب محل";
+    Layout = "_AuthLayout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth-styles.css" />
+}
+
+<div class="auth-container auth-theme-shop">
+    <div class="auth-card">
+        <div class="auth-header position-relative">
+            <div class="auth-icon mb-3">
+                <i class="fas fa-store fa-2x"></i>
+            </div>
+            <h1 class="auth-title">تسجيل محل تجاري</h1>
+            <p class="auth-subtitle">نمنح محلك هوية رقمية أنيقة مع إدارة مخزون وبيع بالجملة</p>
+            <span class="store-badge">تاجر جملة</span>
+        </div>
+        
+        <div class="auth-body">
+            <ul class="auth-highlights">
+                <li><i class="fas fa-hand-holding-dollar"></i>خصومات فورية على طلبات الجملة</li>
+                <li><i class="fas fa-chart-line"></i>تقارير ذكية لأداء المبيعات والمخزون</li>
+                <li><i class="fas fa-headset"></i>دعم مخصص لمتاجر التجزئة 24/7</li>
+            </ul>
+            <form method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+                
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-tie"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.OwnerName" class="form-control" placeholder="اسم صاحب المحل" required />
+                            <label asp-for="Input.OwnerName">اسم صاحب المحل</label>
+                            <div class="invalid-feedback">
+                                يرجى إدخال اسم صاحب المحل
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.OwnerName" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-store"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.ShopName" class="form-control" placeholder="اسم المحل" required />
+                            <label asp-for="Input.ShopName">اسم المحل</label>
+                            <div class="invalid-feedback">
+                                يرجى إدخال اسم المحل
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.ShopName" class="text-danger small"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <select asp-for="Input.ShopType" class="form-select" required>
+                                        <option value="">اختر نوع المحل</option>
+                                        <option value="ملابس">ملابس</option>
+                                        <option value="إلكترونيات">إلكترونيات</option>
+                                        <option value="مواد غذائية">مواد غذائية</option>
+                                        <option value="أثاث">أثاث</option>
+                                        <option value="أخرى">أخرى</option>
+                                    </select>
+                                    <label asp-for="Input.ShopType">نوع النشاط</label>
+                                    <div class="invalid-feedback">
+                                        يرجى اختيار نوع النشاط
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.ShopType" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                <div class="form-floating flex-grow-1">
+                                    <input asp-for="Input.ShopLocation" class="form-control" placeholder="موقع المحل" required />
+                                    <label asp-for="Input.ShopLocation">موقع المحل</label>
+                                    <div class="invalid-feedback">
+                                        يرجى إدخال موقع المحل
+                                    </div>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Input.ShopLocation" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.PhoneNumber" class="form-control" placeholder="رقم الهاتف" required />
+                            <label asp-for="Input.PhoneNumber">رقم الهاتف</label>
+                            <div class="invalid-feedback">
+                                يرجى إدخال رقم هاتف صحيح
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.Email" class="form-control" placeholder="البريد الإلكتروني" type="email" required />
+                            <label asp-for="Input.Email">البريد الإلكتروني</label>
+                            <div class="invalid-feedback">
+                                يرجى إدخال بريد إلكتروني صحيح
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.Password" class="form-control" placeholder="كلمة المرور" autocomplete="new-password" required />
+                            <label asp-for="Input.Password">كلمة المرور</label>
+                            <div class="invalid-feedback">
+                                يرجى إدخال كلمة مرور قوية
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-text small text-muted">يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل</div>
+                    <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
+                        <div class="form-floating flex-grow-1">
+                            <input asp-for="Input.ConfirmPassword" class="form-control" placeholder="تأكيد كلمة المرور" autocomplete="new-password" required />
+                            <label asp-for="Input.ConfirmPassword">تأكيد كلمة المرور</label>
+                            <div class="invalid-feedback">
+                                يجب أن تتطابق كلمتا المرور
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <div class="alert alert-info small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    سعر الجملة يُطبق تلقائياً عند شراء 50 قطعة فأكثر.
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                    <label class="form-check-label small legal-links" for="termsCheck">
+                        أوافق على
+                        <a data-bs-toggle="modal" data-bs-target="#termsModal">الشروط والأحكام</a>
+                        و
+                        <a data-bs-toggle="modal" data-bs-target="#privacyModal">سياسة الخصوصية</a>
+                    </label>
+                    <div class="invalid-feedback">
+                        يجب الموافقة على الشروط والأحكام
+                    </div>
+                </div>
+
+                <partial name="~/Views/Shared/_Recaptcha.cshtml" />
+
+                <button type="submit" class="btn btn-auth mb-3">
+                    <i class="fas fa-store me-2"></i> تسجيل المحل
+                </button>
+
+                <div class="text-center mt-3">
+                    <p class="mb-0">لديك حساب بالفعل؟ <a asp-page="./Login" class="text-primary fw-bold">سجل دخولك</a></p>
+                </div>
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            <p class="mb-0 small">© @DateTime.Now.Year منصة رين. جميع الحقوق محفوظة</p>
+        </div>
+    </div>
+</div>
+
+<!-- Floating decoration elements -->
+<div class="login-decoration decoration-1"></div>
+<div class="login-decoration decoration-2"></div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Enable form validation
+        (function () {
+            'use strict'
+            
+            // Fetch the form we want to apply custom validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+            
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+            
+            // Password match validation
+            var password = document.querySelector('input[name="Input.Password"]')
+            var confirmPassword = document.querySelector('input[name="Input.ConfirmPassword"]')
+            
+            function validatePassword() {
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.setCustomValidity("كلمات المرور غير متطابقة")
+                } else {
+                    confirmPassword.setCustomValidity("")
+                }
+            }
+            
+            password.onchange = validatePassword
+            confirmPassword.onkeyup = validatePassword
+        })()
+    </script>
+}

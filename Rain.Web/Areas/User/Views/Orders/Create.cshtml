@@ -1,0 +1,45 @@
+@using Rain.Domain.Entities
+@model Rain.Web.Areas.User.Controllers.OrdersController.CreateOrderInput
+@{
+    ViewData["Title"] = "إنشاء طلب";
+    var offer = ViewBag.Offer as SupplierOffer;
+}
+<div class="container py-3">
+    <h3 class="mb-3">إنشاء طلب</h3>
+
+    @if (offer != null)
+    {
+        <div class="alert alert-info">
+            <div><strong>المنتج:</strong> @offer.Product?.Name</div>
+            <div><strong>السعر:</strong> @offer.Price.ToString("0.00")</div>
+            <input type="hidden" name="SupplierOfferId" value="@offer.Id" />
+        </div>
+    }
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+        @if (offer == null)
+        {
+            <div class="mb-3">
+                <label class="form-label">العرض</label>
+                <input asp-for="SupplierOfferId" class="form-control" />
+            </div>
+        }
+        <div class="mb-3">
+            <label class="form-label">الكمية</label>
+            <input asp-for="Quantity" class="form-control" />
+            <span asp-validation-for="Quantity" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">عنوان الشحن</label>
+            <select asp-for="ShippingAddressId" class="form-select" asp-items="ViewBag.Addresses"></select>
+        </div>
+        <div>
+            <button class="btn btn-primary">تأكيد الطلب</button>
+            <a class="btn btn-secondary" href="@Url.Action("Index")">رجوع</a>
+        </div>
+    </form>
+</div>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

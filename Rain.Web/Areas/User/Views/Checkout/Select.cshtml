@@ -1,0 +1,28 @@
+@using Rain.Domain.Enums
+@model Rain.Web.Areas.User.Controllers.CheckoutController.SelectPaymentInput
+@{
+    ViewData["Title"] = "اختيار وسيلة الدفع";
+    var order = ViewBag.Order as Rain.Domain.Entities.Order;
+}
+<div class="container py-3">
+    <h3 class="mb-3">اختيار وسيلة الدفع</h3>
+    <div class="mb-3">
+        <div><strong>رقم الطلب:</strong> @order?.Id</div>
+        <div><strong>الإجمالي:</strong> @order?.Total.ToString("0.00")</div>
+    </div>
+    <form method="post" asp-action="Pay">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="OrderId" />
+        <div class="mb-3">
+            <label class="form-label">وسيلة الدفع</label>
+            <select asp-for="Method" class="form-select">
+                <option value="@PaymentMethod.Card">بطاقة (Visa/Mastercard/Apple Pay)</option>
+                <option value="@PaymentMethod.KNET">KNET</option>
+                <option value="@PaymentMethod.Mada">Mada</option>
+                <option value="@PaymentMethod.BankTransfer">تحويل بنكي</option>
+            </select>
+        </div>
+        <button class="btn btn-primary">الدفع الآن</button>
+        <a class="btn btn-secondary" href="@Url.Action("Details","Orders", new { area = "User", id = order?.Id })">رجوع</a>
+    </form>
+</div>

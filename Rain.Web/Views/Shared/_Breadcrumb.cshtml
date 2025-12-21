@@ -1,0 +1,21 @@
+@{
+    var items = ViewBag.Breadcrumb as System.Collections.IEnumerable;
+}
+@if (items != null)
+{
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            @foreach (dynamic i in items)
+            {
+                if (i.Active == true)
+                {
+                    <li class="breadcrumb-item active" aria-current="page">@i.Text</li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item"><a href="@i.Url">@i.Text</a></li>
+                }
+            }
+        </ol>
+    </nav>
+}

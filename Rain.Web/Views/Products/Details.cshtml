@@ -1,0 +1,189 @@
+@using Rain.Domain.Entities
+@model Product
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/products.css" />
+}
+
+@{
+    var supplierNames = ViewBag.SupplierNames as System.Collections.Generic.Dictionary<string, string>
+        ?? new System.Collections.Generic.Dictionary<string, string>();
+    var activeOffers = Model.SupplierOffers?.Where(o => o.IsActive).OrderBy(o => o.Price).ToList()
+        ?? new System.Collections.Generic.List<SupplierOffer>();
+    var bestOffer = activeOffers.FirstOrDefault();
+}
+
+<div class="product-details-hero text-white py-5 mb-5">
+    <div class="container position-relative">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb text-white-50 mb-3">
+                <li class="breadcrumb-item"><a href="@Url.Action("Index","Products")" class="text-white-50">المنتجات</a></li>
+                <li class="breadcrumb-item text-white active" aria-current="page">@Model.Name</li>
+            </ol>
+        </nav>
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <span class="badge rounded-pill bg-gradient">@Model.Category?.Name</span>
+                <h1 class="display-5 fw-bold mt-3 mb-3">@Model.Name</h1>
+                <p class="lead text-white-50 mb-4">@Model.Description</p>
+                @if (bestOffer != null)
+                {
+                    <div class="d-flex align-items-center gap-3">
+                        <div>
+                            <span class="text-uppercase small text-white-50">أفضل سعر</span>
+                            <div class="display-6 fw-bold">@bestOffer.Price.ToString("0.00") <small class="fs-5">@bestOffer.Currency</small></div>
+                        </div>
+                        <a class="btn btn-light rounded-pill px-4" href="@Url.Action("Create","Orders", new { area = "User", offerId = bestOffer.Id })">
+                            اطلب الآن <i class="fas fa-arrow-left ms-2"></i>
+                        </a>
+                    </div>
+                }
+            </div>
+            <div class="col-lg-5">
+                <div class="product-gallery rounded-5 shadow p-3 bg-white">
+                    @if (Model.Images?.Any() == true)
+                    {
+                        var cover = Model.Images.First();
+                        <div class="ratio ratio-4x3 rounded-4 overflow-hidden mb-3">
+                            <img src="@cover.Url" alt="@Model.Name" class="w-100 h-100 object-fit-cover" />
+                        </div>
+                        <div class="product-gallery-thumbs d-flex gap-2">
+                            @foreach (var img in Model.Images.Take(4))
+                            {
+                                <div class="ratio ratio-1x1 rounded-3 overflow-hidden thumb-item">
+                                    <img src="@img.Url" alt="@Model.Name" class="w-100 h-100 object-fit-cover" />
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="ratio ratio-4x3 rounded-5 bg-light d-flex align-items-center justify-content-center">
+                            <div class="gallery-placeholder text-center">
+                                <i class="fas fa-cube fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">صورة المنتج</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="hero-shape hero-shape-1"></div>
+        <div class="hero-shape hero-shape-2"></div>
+        <div class="hero-shape hero-shape-3"></div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="product-panel rounded-4 p-4 mb-4 shadow-sm">
+                <h5 class="mb-3">عن المنتج</h5>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="info-chip">
+                            <span class="text-muted small">العلامة التجارية</span>
+                            <div class="fw-semibold">@Model.Brand?.Name ?? "—"</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="info-chip">
+                            <span class="text-muted small">المورد الأصلي</span>
+                            <div class="fw-semibold">@Model.SellerName ?? "—"</div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="info-chip">
+                            <span class="text-muted small">الوصف</span>
+                            <p class="mb-0">@Model.Description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-panel rounded-4 p-4 shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <p class="text-muted small mb-1">شبكة الموردين</p>
+                        <h5 class="mb-0">عروض متاحة (@activeOffers.Count)</h5>
+                    </div>
+                    <span class="badge bg-light text-dark rounded-pill">@Model.SupplierOffers?.Count</span>
+                </div>
+
+                @if (activeOffers.Any())
+                {
+                    <div class="row g-3">
+                        @foreach (var offer in activeOffers)
+                        {
+                            var supplierDisplay = supplierNames.ContainsKey(offer.SupplierId)
+                                ? supplierNames[offer.SupplierId]
+                                : offer.SupplierId;
+                            <div class="col-12">
+                                <div class="supplier-card p-3 rounded-4 border">
+                                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                        <div>
+                                            <h6 class="mb-1">@supplierDisplay</h6>
+                                            <p class="text-muted small mb-0">الحد الأدنى: @offer.MinOrderQty | المخزون: @offer.StockQty</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fs-4 fw-bold">@offer.Price.ToString("0.00") <small class="fs-6">@offer.Currency</small></div>
+                                            @if (offer.AverageRating > 0)
+                                            {
+                                                <div class="text-warning small">
+                                                    <i class="fas fa-star"></i> @offer.AverageRating.ToString("0.0") ( @offer.RatingsCount تقييم )
+                                                </div>
+                                            }
+                                        </div>
+                                        <div>
+                                            <a class="btn btn-outline-primary rounded-pill" href="@Url.Action("Create","Orders", new { area = "User", offerId = offer.Id })">
+                                                اطلب من هذا المورد
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state text-center py-4">
+                        <i class="fas fa-store-slash fa-2x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">لا توجد عروض نشطة حالياً لهذا المنتج</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="product-panel rounded-4 p-4 mb-4 shadow-sm">
+                <p class="text-muted small mb-1">معلومات سريعة</p>
+                <ul class="list-unstyled mb-0">
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <span>الفئة</span>
+                        <span class="fw-semibold">@Model.Category?.Name</span>
+                    </li>
+                    <li class="d-flex justify-content-between py-2 border-bottom">
+                        <span>العلامة</span>
+                        <span class="fw-semibold">@Model.Brand?.Name ?? "—"</span>
+                    </li>
+                    <li class="d-flex justify-content-between py-2">
+                        <span>عدد العروض</span>
+                        <span class="fw-semibold">@activeOffers.Count</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="product-panel rounded-4 p-4 shadow-sm">
+                <h6 class="mb-3">تواصل معنا</h6>
+                <p class="text-muted small mb-4">هل تحتاج إلى عروض خاصة أو دعم إضافي؟ فريقنا متواجد لخدمتك.</p>
+                <a class="btn btn-primary w-100 rounded-pill" href="mailto:support@rain-platform.com">
+                    تواصل مع فريق المبيعات
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

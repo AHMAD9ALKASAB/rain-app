@@ -1,0 +1,37 @@
+@using Rain.Domain.Entities
+@model Product
+@{
+    ViewData["Title"] = "إضافة منتج";
+}
+<div class="container py-3">
+    <h3 class="mb-3">إضافة منتج</h3>
+    <form method="post">
+        @Html.AntiForgeryToken()
+        <div class="mb-3">
+            <label class="form-label">الاسم</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <label class="form-label">الفئة</label>
+                <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories"></select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">الماركة</label>
+                <select asp-for="BrandId" class="form-select" asp-items="ViewBag.Brands"></select>
+            </div>
+        </div>
+        <div class="mb-3 mt-2">
+            <label class="form-label">الوصف</label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+        </div>
+        <div>
+            <button class="btn btn-primary">حفظ</button>
+            <a class="btn btn-secondary" href="@Url.Action("Index")">رجوع</a>
+        </div>
+    </form>
+</div>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

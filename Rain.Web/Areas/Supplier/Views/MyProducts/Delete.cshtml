@@ -1,0 +1,27 @@
+@model Rain.Domain.Entities.SupplierOffer
+@{
+  ViewData["Title"] = "حذف المنتج";
+}
+<h1 class="mb-3">حذف المنتج</h1>
+<div class="alert alert-warning" role="alert">
+  <div class="fw-bold mb-1">هل أنت متأكد من حذف هذا المنتج؟</div>
+  <div>في حال التأكيد لا يمكنك التراجع وسيتم حذف المنتج نهائياً من الموقع.</div>
+</div>
+<div class="card mb-3">
+  <div class="card-body d-flex align-items-center">
+    <img src="@(Model.Product?.Images?.FirstOrDefault()?.Url ?? "/images/logo.png")" alt="" style="height:60px" class="me-3" />
+    <div>
+      <div class="fw-semibold">@Model.Product?.Name</div>
+      <div class="text-muted small">السعر: @Model.Price @Model.Currency | المخزون: @Model.StockQty | الحد الأدنى: @Model.MinOrderQty</div>
+      @if(!string.IsNullOrWhiteSpace(Model.Product?.SellerName)){
+        <div class="text-muted small">البائع: @Model.Product.SellerName</div>
+      }
+    </div>
+  </div>
+</div>
+<form asp-action="Delete" method="post" class="d-inline">
+  @Html.AntiForgeryToken()
+  <input type="hidden" asp-for="Id" />
+  <button type="submit" class="btn btn-danger">تأكيد الحذف</button>
+</form>
+<a asp-action="Index" class="btn btn-outline-secondary ms-1">إلغاء</a>

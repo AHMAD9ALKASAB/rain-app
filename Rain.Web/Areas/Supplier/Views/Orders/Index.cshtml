@@ -1,0 +1,44 @@
+@using Rain.Domain.Entities
+@using Rain.Domain.Enums
+@model List<Order>
+@{
+    ViewData["Title"] = "طلبات تخص عروضي";
+}
+<div class="container py-3">
+    <h3 class="mb-3">طلبات تخص عروضي</h3>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>التاريخ</th>
+                    <th>الإجمالي</th>
+                    <th>الحالة</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var o in Model)
+            {
+                <tr>
+                    <td>@o.Id</td>
+                    <td>@o.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td>
+                    <td>@o.Total.ToString("0.00")</td>
+                    <td>@o.Status</td>
+                    <td>
+                        <form method="post" asp-action="Accept" asp-route-id="@o.Id" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-outline-success" @(o.Status==OrderStatus.Pending?null:"disabled")>قبول</button>
+                        </form>
+                        <form method="post" asp-action="Ship" asp-route-id="@o.Id" class="d-inline ms-1">
+                            @Html.AntiForgeryToken()
+                            <button class="btn btn-sm btn-outline-primary" @(o.Status==OrderStatus.Accepted?null:"disabled")>تم الشحن</button>
+                        </form>
+                        <a class="btn btn-sm btn-outline-secondary ms-1" href="@Url.Action("Details","Orders", new { area="User", id=o.Id })">تفاصيل</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
