@@ -225,7 +225,8 @@ try
     
     builder.Services.AddDataProtection()
         .PersistKeysToFileSystem(new DirectoryInfo(keysDirectory))
-        .SetApplicationName("RainApp");
+        .SetApplicationName("RainApp")
+        .SetDefaultKeyLifetime(TimeSpan.FromDays(90)); // زيادة مدة صلاحية المفاتيح
 }
 catch (Exception ex)
 {
@@ -237,29 +238,65 @@ catch (Exception ex)
         .SetApplicationName("RainApp");
 }
 
-// ============ بقية التهيئة ============
+// ============ إعدادات Identity المحسنة لحل مشاكل التسجيل ============
 builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole>()
+    .AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        // 🔧 **تسهيل متطلبات كلمة المرور للتجربة**
+        options.Password.RequiredLength = 6;  // تقليل من 8 إلى 6
+        options.Password.RequireNonAlphanumeric = false; // تعطيل الرموز الخاصة
+        options.Password.RequireUppercase = false; // تعطيل الأحرف الكبيرة
+        options.Password.RequireLowercase = true;  // تشغيل الأحرف الصغيرة فقط
+        options.Password.RequireDigit = true;      // تشغيل الأرقام
+        
+        // 🔧 **تعطيل متطلبات تأكيد الحساب**
+        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedEmail = false;
+        options.SignIn.RequireConfirmedPhoneNumber = false;
+        
+        // 🔧 **إعدادات القفل**
+        options.Lockout.MaxFailedAccessAttempts = 10; // زيادة المحاولات
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+        
+        // 🔧 **متطلبات المستخدم**
+        options.User.RequireUniqueEmail = true;
+        options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    })
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultUI()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddDefaultUI();
 
+// 🔧 **إعدادات Token Providers**
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+{
+    options.TokenLifespan = TimeSpan.FromDays(3); // زيادة مدة صلاحية التوكن
+});
+
+// 🔧 **إعدادات Application Cookie**
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Identity/Account/Login";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.LogoutPath = "/Identity/Account/Logout";
+    
+    // 🔧 **زيادة مدة صلاحية الكوكيز**
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    
+    // 🔧 **إعدادات الكوكيز لـ Render**
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None; // مهم لـ Render
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.Name = "RainApp.Auth";
+    
+    // 🔧 **تمكين إعادة التوجيه بعد تسجيل الدخول**
+    options.ReturnUrlParameter = "returnUrl";
 });
 
-// Identity password & lockout policies
-builder.Services.Configure<IdentityOptions>(options =>
+// 🔧 **إعدادات مشاكل تسجيل الموردين والمحلات**
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
 {
-    options.Password.RequiredLength = 8;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireDigit = true;
-    options.Lockout.MaxFailedAccessAttempts = 5;
-    options.SignIn.RequireConfirmedAccount = true;
+    options.ValidationInterval = TimeSpan.FromMinutes(30); // تقليل التكرار للتحقق
 });
 
 // Localization (ar/en)
@@ -305,6 +342,29 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// 🔧 **Middleware لإصلاح مشاكل returnUrl**
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value ?? "";
+    
+    // إصلاح مشكلة returnUrl في صفحات التسجيل والدخول
+    if (path.StartsWith("/Identity/Account/", StringComparison.OrdinalIgnoreCase))
+    {
+        var query = context.Request.QueryString.Value ?? "";
+        if (string.IsNullOrEmpty(query) || !query.Contains("returnUrl", StringComparison.OrdinalIgnoreCase))
+        {
+            var returnUrl = context.Request.Query["returnUrl"].FirstOrDefault();
+            if (string.IsNullOrEmpty(returnUrl))
+            {
+                // تعيين returnUrl افتراضي
+                context.Request.QueryString = new QueryString($"{context.Request.QueryString}&returnUrl=%2F");
+            }
+        }
+    }
+    
+    await next();
+});
+
 // Request localization
 var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
 app.UseRequestLocalization(localizationOptions.Value);
@@ -335,7 +395,7 @@ app.Use(async (context, next) =>
     // ✅ **CSP المحدثة للسماح بـ Bootstrap, jQuery, والكود المدمج**
     var csp = string.Join("; ", new[]{
         "default-src 'self'",
-        "script-src 'self' https://www.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://code.jquery.com 'unsafe-inline'",
+        "script-src 'self' https://www.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://code.jquery.com 'unsafe-inline' 'unsafe-eval'",
         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
         "img-src 'self' data: https:",
         "font-src 'self' data: https:",
@@ -363,6 +423,18 @@ app.MapGet("/health", () => Results.Json(new {
     timestamp = DateTime.UtcNow,
     service = "Rain E-Commerce API",
     environment = app.Environment.EnvironmentName
+}));
+
+// 🔧 **Test endpoint للتأكد من تشغيل الحسابات**
+app.MapGet("/test-login", () => Results.Json(new
+{
+    test_users = new[]
+    {
+        new { email = "admin@example.com", password = "Password123!", role = "Admin" },
+        new { email = "buyer@example.com", password = "Password123!", role = "Buyer" },
+        new { email = "supplier@example.com", password = "Password123!", role = "Supplier" }
+    },
+    instructions = "Visit /Identity/Account/Login to login"
 }));
 
 // Redirect root to Home page
