@@ -156,8 +156,8 @@ builder.Services.AddDbContext<ApplicationDbContext>((provider, options) =>
         {
             npgsqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorCodesToAdd: null);
+                maxRetryDelay = TimeSpan.FromSeconds(30),
+                errorCodesToAdd = null);
         });
         Console.WriteLine("✅ Configured for PostgreSQL");
     }
@@ -242,20 +242,24 @@ app.Use(async (context, next) =>
     await next();
 });
 
+// 🔧 **التعديل الأساسي: تحديث سياسة أمان CSP للسماح بمصادر CDN**
 // Basic security headers (CSP, X-Content-Type-Options, X-Frame-Options)
 app.Use(async (context, next) =>
 {
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";
     context.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
-    // Allow Bootstrap CDN and Google reCAPTCHA
+    
+    // ✅ **CSP المحدثة للسماح بـ Bootstrap, jQuery, والكود المدمج**
     var csp = string.Join("; ", new[]{
         "default-src 'self'",
-        "script-src 'self' https://www.google.com https://www.gstatic.com",
-        "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data:",
-        "font-src 'self' data:",
-        "frame-src 'self' https://www.google.com"
+        "script-src 'self' https://www.google.com https://www.gstatic.com https://cdn.jsdelivr.net https://code.jquery.com 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+        "img-src 'self' data: https:",
+        "font-src 'self' data: https:",
+        "frame-src 'self' https://www.google.com",
+        "connect-src 'self' https://api.openai.com"
     });
+    
     context.Response.Headers["Content-Security-Policy"] = csp;
     await next();
 });
