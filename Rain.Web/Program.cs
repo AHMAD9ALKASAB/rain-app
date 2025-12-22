@@ -67,6 +67,23 @@ builder.Services.AddScoped<IPaymentProvider>(sp =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Server=(localdb)\\MSSQLLocalDB;Database=RainDb;Trusted_Connection=True;TrustServerCertificate=True";
 
+// 🔧 **إصلاح جديد: إذا كانت السلسلة تبدأ بـ // أضف postgresql: قبلها**
+Console.WriteLine($"🔍 Original connection string: {connectionString}");
+
+if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("//"))
+{
+    try
+    {
+        // إضافة postgresql: في البداية
+        connectionString = "postgresql:" + connectionString;
+        Console.WriteLine($"✅ Fixed connection string prefix to: {connectionString}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error fixing connection string: {ex.Message}");
+    }
+}
+
 // **تحويل PostgreSQL URL من Render إلى صيغة قابلة للاستخدام - الإصلاح النهائي**
 if (connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
 {
