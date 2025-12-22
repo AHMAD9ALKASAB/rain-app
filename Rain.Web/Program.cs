@@ -17,6 +17,7 @@ using Rain.Infrastructure.Seed;
 using Npgsql;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.DataProtection;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -209,10 +210,33 @@ builder.Services.AddDbContext<ApplicationDbContext>((provider, options) =>
     }
 });
 
-// ============ Data Protection لحل مشكلة XML Encryptor ============
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("/var/data-protection-keys/"))
-    .SetApplicationName("RainApp");
+// ============ Data Protection - إصلاح مشكلة الصلاحيات على Render ============
+// استبدل هذا القسم كاملاً بالقسم التالي
+try
+{
+    // على Render، استخدم مجلد مؤقت بدلاً من /var/
+    var keysDirectory = Path.Combine(Path.GetTempPath(), "rain-dataprotection-keys");
+    
+    // تأكد من وجود المجلد
+    if (!Directory.Exists(keysDirectory))
+    {
+        Directory.CreateDirectory(keysDirectory);
+        Console.WriteLine($"✅ Created DataProtection keys directory: {keysDirectory}");
+    }
+    
+    builder.Services.AddDataProtection()
+        .PersistKeysToFileSystem(new DirectoryInfo(keysDirectory))
+        .SetApplicationName("RainApp");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"⚠️ Error setting up DataProtection: {ex.Message}");
+    Console.WriteLine("⚠️ Using in-memory DataProtection instead");
+    
+    // الخيار الاحتياطي: استخدام في الذاكرة
+    builder.Services.AddDataProtection()
+        .SetApplicationName("RainApp");
+}
 
 // ============ بقية التهيئة ============
 builder.Services
@@ -281,10 +305,13 @@ app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseRateLimiter();
+
+// إزالة RateLimiter مؤقتاً إذا كان يسبب مشاكل
+// app.UseRateLimiter();
 
 // Request localization
-app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
+var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(localizationOptions.Value);
 
 // Guard: Suppliers can only access ChangePassword under Identity Manage
 app.Use(async (context, next) =>
@@ -335,21 +362,22 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 // ============ إضافة Health Check Endpoints ============
-app.MapGet("/health", () => Results.Ok(new { 
+app.MapGet("/health", () => Results.Json(new { 
     status = "healthy", 
     timestamp = DateTime.UtcNow,
-    service = "Rain API",
-    version = "1.0"
+    service = "Rain E-Commerce API",
+    environment = app.Environment.EnvironmentName
 }));
 
-app.MapGet("/", () => Results.Ok(new { 
+app.MapGet("/", () => Results.Json(new { 
     message = "Rain E-Commerce API is running", 
     version = "1.0",
     endpoints = new {
         health = "/health",
         api = "/api",
-        swagger = "/swagger"
-    }
+        docs = "/swagger"
+    },
+    instructions = "Please visit /Home or /Identity/Account/Login for the web interface"
 }));
 
 // ============ Seed database ============
