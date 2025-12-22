@@ -211,7 +211,6 @@ builder.Services.AddDbContext<ApplicationDbContext>((provider, options) =>
 });
 
 // ============ Data Protection - إصلاح مشكلة الصلاحيات على Render ============
-// استبدل هذا القسم كاملاً بالقسم التالي
 try
 {
     // على Render، استخدم مجلد مؤقت بدلاً من /var/
@@ -306,9 +305,6 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// إزالة RateLimiter مؤقتاً إذا كان يسبب مشاكل
-// app.UseRateLimiter();
-
 // Request localization
 var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
 app.UseRequestLocalization(localizationOptions.Value);
@@ -361,7 +357,7 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-// ============ إضافة Health Check Endpoints ============
+// ============ Health Check فقط ============
 app.MapGet("/health", () => Results.Json(new { 
     status = "healthy", 
     timestamp = DateTime.UtcNow,
@@ -369,16 +365,8 @@ app.MapGet("/health", () => Results.Json(new {
     environment = app.Environment.EnvironmentName
 }));
 
-app.MapGet("/", () => Results.Json(new { 
-    message = "Rain E-Commerce API is running", 
-    version = "1.0",
-    endpoints = new {
-        health = "/health",
-        api = "/api",
-        docs = "/swagger"
-    },
-    instructions = "Please visit /Home or /Identity/Account/Login for the web interface"
-}));
+// Redirect root to Home page
+app.MapGet("/", () => Results.Redirect("/Home"));
 
 // ============ Seed database ============
 using (var scope = app.Services.CreateScope())
