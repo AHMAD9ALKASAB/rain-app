@@ -68,7 +68,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? "Server=(localdb)\\MSSQLLocalDB;Database=RainDb;Trusted_Connection=True;TrustServerCertificate=True";
 
 // **تحويل PostgreSQL URL من Render إلى صيغة قابلة للاستخدام - الإصلاح النهائي**
-if (connectionString.StartsWith("postgresql://"))
+if (connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
 {
     try
     {
@@ -84,7 +84,7 @@ if (connectionString.StartsWith("postgresql://"))
             var database = match.Groups[4].Value;
             
             // أضف النطاق الكامل إذا كان من Render
-            if (host.Contains("dpg-") && !host.Contains("."))
+            if (host.Contains("dpg-", StringComparison.OrdinalIgnoreCase) && !host.Contains(".", StringComparison.OrdinalIgnoreCase))
             {
                 host = host + ".oregon-postgres.render.com";
             }
@@ -115,14 +115,14 @@ if (connectionString.StartsWith("postgresql://"))
         // محاولة بديلة: استخدم الصيغة المباشرة
         try
         {
-            connectionString = connectionString.Replace("postgresql://", "")
-                .Replace("@", ";Username=").Replace(":", ";Password=", 1)
-                .Replace("/", ";Database=") + ";Port=5432;SSL Mode=Require";
+            connectionString = connectionString.Replace("postgresql://", "", StringComparison.OrdinalIgnoreCase)
+                .Replace("@", ";Username=", StringComparison.OrdinalIgnoreCase).Replace(":", ";Password=", 1, StringComparison.OrdinalIgnoreCase)
+                .Replace("/", ";Database=", StringComparison.OrdinalIgnoreCase) + ";Port=5432;SSL Mode=Require";
             
             // إضافة النطاق الكامل
-            if (connectionString.Contains("dpg-") && !connectionString.Contains("oregon-postgres.render.com"))
+            if (connectionString.Contains("dpg-", StringComparison.OrdinalIgnoreCase) && !connectionString.Contains("oregon-postgres.render.com", StringComparison.OrdinalIgnoreCase))
             {
-                connectionString = connectionString.Replace("dpg-", "dpg-").Replace(";Host=", ";Host=") + ".oregon-postgres.render.com";
+                connectionString = connectionString.Replace("dpg-", "dpg-", StringComparison.OrdinalIgnoreCase).Replace(";Host=", ";Host=", StringComparison.OrdinalIgnoreCase) + ".oregon-postgres.render.com";
             }
         }
         catch (Exception ex2)
@@ -133,9 +133,9 @@ if (connectionString.StartsWith("postgresql://"))
 }
 
 // تحديد نوع قاعدة البيانات
-var isPostgresConnection = connectionString.Contains("Host=") || 
-                          connectionString.Contains("postgres") ||
-                          connectionString.Contains("dpg-");
+var isPostgresConnection = connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase) || 
+                          connectionString.Contains("postgres", StringComparison.OrdinalIgnoreCase) ||
+                          connectionString.Contains("dpg-", StringComparison.OrdinalIgnoreCase);
 
 Console.WriteLine($"📊 Is PostgreSQL: {isPostgresConnection}");
 Console.WriteLine($"📊 Connection String length: {connectionString?.Length ?? 0}");
