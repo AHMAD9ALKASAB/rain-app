@@ -115,14 +115,18 @@ if (connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreC
         // محاولة بديلة: استخدم الصيغة المباشرة
         try
         {
-            connectionString = connectionString.Replace("postgresql://", "", StringComparison.OrdinalIgnoreCase)
-                .Replace("@", ";Username=", StringComparison.OrdinalIgnoreCase).Replace(":", ";Password=", 1, StringComparison.OrdinalIgnoreCase)
+            connectionString = connectionString
+                .Replace("postgresql://", "", StringComparison.OrdinalIgnoreCase)
+                .Replace("@", ";Username=", StringComparison.OrdinalIgnoreCase)
+                .Replace(":", ";Password=", StringComparison.OrdinalIgnoreCase) // تم إصلاح الخطأ هنا
                 .Replace("/", ";Database=", StringComparison.OrdinalIgnoreCase) + ";Port=5432;SSL Mode=Require";
             
             // إضافة النطاق الكامل
             if (connectionString.Contains("dpg-", StringComparison.OrdinalIgnoreCase) && !connectionString.Contains("oregon-postgres.render.com", StringComparison.OrdinalIgnoreCase))
             {
-                connectionString = connectionString.Replace("dpg-", "dpg-", StringComparison.OrdinalIgnoreCase).Replace(";Host=", ";Host=", StringComparison.OrdinalIgnoreCase) + ".oregon-postgres.render.com";
+                connectionString = connectionString
+                    .Replace("dpg-", "dpg-", StringComparison.OrdinalIgnoreCase)
+                    .Replace(";Host=", ";Host=", StringComparison.OrdinalIgnoreCase) + ".oregon-postgres.render.com";
             }
         }
         catch (Exception ex2)
