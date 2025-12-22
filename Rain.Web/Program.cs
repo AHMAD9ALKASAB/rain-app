@@ -2,6 +2,11 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Rain.Infrastructure.Identity;
 using Rain.Infrastructure.Persistence;
 using Rain.Infrastructure.Files;
@@ -11,6 +16,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Rain.Infrastructure.Seed;
 using Npgsql;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +31,17 @@ builder.Services
 builder.Services.AddRazorPages();
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
+
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddRateLimiter(options =>
 {
@@ -114,7 +131,7 @@ if (connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreC
                 Username = username,
                 Password = password,
                 SslMode = SslMode.Require,
-                TrustServerCertificate = false // هذه القيمة لم تعد ضرورية
+                TrustServerCertificate = false
             }.ToString();
             
             Console.WriteLine($"✅ PostgreSQL connection string parsed successfully for {host}");
@@ -135,7 +152,7 @@ if (connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreC
             connectionString = connectionString
                 .Replace("postgresql://", "", StringComparison.OrdinalIgnoreCase)
                 .Replace("@", ";Username=", StringComparison.OrdinalIgnoreCase)
-                .Replace(":", ";Password=", StringComparison.OrdinalIgnoreCase) // تم إصلاح الخطأ هنا
+                .Replace(":", ";Password=", StringComparison.OrdinalIgnoreCase)
                 .Replace("/", ";Database=", StringComparison.OrdinalIgnoreCase) + ";Port=5432;SSL Mode=Require";
             
             // إضافة النطاق الكامل
@@ -174,18 +191,28 @@ builder.Services.AddDbContext<ApplicationDbContext>((provider, options) =>
         {
             npgsqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
-                maxRetryDelay: TimeSpan.FromSeconds(30),  // 🔧 **استخدم : بدلاً من =**
-                errorCodesToAdd: null);                  // 🔧 **استخدم : بدلاً من =**
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorCodesToAdd: null);
+            npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
         });
         Console.WriteLine("✅ Configured for PostgreSQL");
     }
     else
     {
         // استخدام SQL Server
-        options.UseSqlServer(connectionString);
+        options.UseSqlServer(connectionString, sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(5);
+            sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        });
         Console.WriteLine("✅ Configured for SQL Server");
     }
 });
+
+// ============ Data Protection لحل مشكلة XML Encryptor ============
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/var/data-protection-keys/"))
+    .SetApplicationName("RainApp");
 
 // ============ بقية التهيئة ============
 builder.Services
@@ -231,18 +258,33 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
+// إصلاح مشكلة HTTPS Redirect في Render
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+else
+{
+    // في Production على Render، لا نستخدم HTTPS Redirection لأن Render يعتني بذلك
+    app.Use(async (context, next) =>
+    {
+        context.Response.Headers.Remove("X-Forwarded-Proto");
+        await next();
+    });
+}
 
+app.UseStaticFiles();
 app.UseRouting();
+
+// إضافة CORS
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseRateLimiter();
 
 // Request localization
-app.UseRequestLocalization(app.Services.GetRequiredService<Microsoft.Extensions.Options.IOptions<RequestLocalizationOptions>>().Value);
+app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 
 // Guard: Suppliers can only access ChangePassword under Identity Manage
 app.Use(async (context, next) =>
@@ -292,6 +334,24 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
+// ============ إضافة Health Check Endpoints ============
+app.MapGet("/health", () => Results.Ok(new { 
+    status = "healthy", 
+    timestamp = DateTime.UtcNow,
+    service = "Rain API",
+    version = "1.0"
+}));
+
+app.MapGet("/", () => Results.Ok(new { 
+    message = "Rain E-Commerce API is running", 
+    version = "1.0",
+    endpoints = new {
+        health = "/health",
+        api = "/api",
+        swagger = "/swagger"
+    }
+}));
+
 // ============ Seed database ============
 using (var scope = app.Services.CreateScope())
 {
@@ -332,5 +392,5 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ============ إصلاح مشكلة البورت في Render ============
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 app.Run($"http://0.0.0.0:{port}");
