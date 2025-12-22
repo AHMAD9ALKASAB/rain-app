@@ -147,6 +147,7 @@ Console.WriteLine($"📊 Connection String length: {connectionString?.Length ?? 
 // تخزين القيم لاستخدامها لاحقاً
 var isPostgres = isPostgresConnection;
 
+// 🔧 **التصحيح: استخدم فاصلة (,) بدلاً من (=) في المعلمات المسماة**
 builder.Services.AddDbContext<ApplicationDbContext>((provider, options) =>
 {
     if (isPostgres)
@@ -156,8 +157,8 @@ builder.Services.AddDbContext<ApplicationDbContext>((provider, options) =>
         {
             npgsqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 5,
-                maxRetryDelay = TimeSpan.FromSeconds(30),
-                errorCodesToAdd = null);
+                maxRetryDelay: TimeSpan.FromSeconds(30),  // 🔧 **استخدم : بدلاً من =**
+                errorCodesToAdd: null);                  // 🔧 **استخدم : بدلاً من =**
         });
         Console.WriteLine("✅ Configured for PostgreSQL");
     }
