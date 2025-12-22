@@ -8,6 +8,8 @@ using Rain.Infrastructure.Files;
 using Rain.Web.Services;
 using Rain.Infrastructure.Payments;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Rain.Infrastructure.Seed;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,16 +62,72 @@ builder.Services.AddScoped<IPaymentProvider>(sp =>
     return new MockPaymentProvider();
 });
 
-// EF Core + Identity
+// ============ EF Core + Identity ============
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Server=(localdb)\\MSSQLLocalDB;Database=RainDb;Trusted_Connection=True;TrustServerCertificate=True";
 
-builder.Services.AddDbContext<Rain.Infrastructure.Persistence.ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+// تحويل PostgreSQL URL من Render إلى صيغة قابلة للاستخدام
+if (connectionString.StartsWith("postgresql://"))
+{
+    try
+    {
+        var databaseUri = new Uri(connectionString);
+        var userInfo = databaseUri.UserInfo.Split(':');
+        connectionString = new NpgsqlConnectionStringBuilder
+        {
+            Host = databaseUri.Host,
+            Port = databaseUri.Port,
+            Username = userInfo[0],
+            Password = userInfo[1],
+            Database = databaseUri.LocalPath.TrimStart('/'),
+            SslMode = SslMode.Require,
+            TrustServerCertificate = true
+        }.ToString();
+        Console.WriteLine($"✅ PostgreSQL connection string parsed successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Error parsing PostgreSQL URL: {ex.Message}");
+    }
+}
 
+// تحديد نوع قاعدة البيانات
+var isPostgresConnection = connectionString.Contains("Host=") || 
+                          connectionString.Contains("postgres") ||
+                          connectionString.Contains("dpg-");
+
+Console.WriteLine($"📊 Connection String: {connectionString}");
+Console.WriteLine($"📊 Is PostgreSQL: {isPostgresConnection}");
+
+// تخزين القيم لاستخدامها لاحقاً
+var isPostgres = isPostgresConnection;
+
+builder.Services.AddDbContext<ApplicationDbContext>((provider, options) =>
+{
+    if (isPostgres)
+    {
+        // استخدام PostgreSQL
+        options.UseNpgsql(connectionString, npgsqlOptions =>
+        {
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorCodesToAdd: null);
+        });
+        Console.WriteLine("✅ Configured for PostgreSQL");
+    }
+    else
+    {
+        // استخدام SQL Server
+        options.UseSqlServer(connectionString);
+        Console.WriteLine("✅ Configured for SQL Server");
+    }
+});
+
+// ============ بقية التهيئة ============
 builder.Services
-    .AddIdentity<Rain.Infrastructure.Identity.ApplicationUser, Microsoft.AspNetCore.Identity.IdentityRole>()
-    .AddEntityFrameworkStores<Rain.Infrastructure.Persistence.ApplicationDbContext>()
+    .AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI()
     .AddDefaultTokenProviders();
 
@@ -167,11 +225,43 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-// Seed roles/admin on startup
+// ============ Seed database ============
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await Rain.Infrastructure.Seed.SeedData.SeedAsync(services);
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        
+        logger.LogInformation($"📊 Database provider: {(isPostgres ? "PostgreSQL" : "SQL Server")}");
+        
+        if (isPostgres)
+        {
+            // لـ PostgreSQL: استخدام EnsureCreated بدلاً من Migrate
+            logger.LogInformation("🔧 Ensuring PostgreSQL database is created...");
+            await context.Database.EnsureCreatedAsync();
+            logger.LogInformation("✅ PostgreSQL database ensured");
+        }
+        else
+        {
+            // لـ SQL Server: استخدم الهجرات
+            logger.LogInformation("🔧 Applying SQL Server migrations...");
+            await context.Database.MigrateAsync();
+            logger.LogInformation("✅ SQL Server migrations applied");
+        }
+        
+        // تشغيل seeding
+        logger.LogInformation("🌱 Seeding database...");
+        await SeedData.SeedAsync(services);
+        logger.LogInformation("✅ Database seeding completed successfully");
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "❌ An error occurred during database initialization");
+        // لا توقف التطبيق - استمر
+    }
 }
 
 app.Run();
