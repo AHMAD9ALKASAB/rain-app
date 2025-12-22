@@ -58,7 +58,7 @@ namespace Rain.Web.Areas.Identity.Pages.Account
             public string Email { get; set; } = string.Empty;
 
             [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 4)] // تم التغيير من 6 إلى 4
             [DataType(DataType.Password)]
             public string Password { get; set; } = string.Empty;
 
@@ -104,26 +104,68 @@ namespace Rain.Web.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
+            
+            // 🔧 **إضافة هذا السطر لإصلاح مشكلة returnUrl**
+            if (string.IsNullOrEmpty(returnUrl) || returnUrl == "/")
+            {
+                returnUrl = "/Home";
+            }
+            
             if (!ModelState.IsValid) return Page();
 
-            var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, EmailConfirmed = false };
+            // 🔧 **إنشاء مستخدم مع EmailConfirmed = true مباشرة**
+            var user = new ApplicationUser 
+            { 
+                UserName = Input.Email, 
+                Email = Input.Email, 
+                EmailConfirmed = true, // تأكيد البريد تلقائياً
+                UserType = Input.AccountType switch
+                {
+                    "Shop" => UserType.Shop,
+                    "Supplier" => UserType.Supplier,
+                    _ => UserType.Individual
+                }
+            };
+            
+            // 🔧 **إضافة DisplayName للموردين**
+            if (Input.AccountType == "Supplier" && !string.IsNullOrEmpty(Input.DisplayName))
+            {
+                user.DisplayName = Input.DisplayName;
+            }
+
             var result = await _userManager.CreateAsync(user, Input.Password);
+            
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password.");
 
-                // Assign role or create supplier application
-                switch ((Input.AccountType ?? "Individual").Trim())
+                // 🔧 **تسجيل الدخول مباشرة بدون انتظار تأكيد البريد**
+                await _signInManager.SignInAsync(user, isPersistent: false);
+
+                // 🔧 **إضافة المستخدم إلى الدور المناسب**
+                string roleName = Input.AccountType switch
                 {
-                    case "Shop":
-                        user.UserType = UserType.Shop;
-                        await _userManager.UpdateAsync(user);
-                        await _userManager.AddToRoleAsync(user, "Shop");
-                        break;
-                    case "Supplier":
-                        user.UserType = UserType.Supplier;
-                        user.DisplayName = Input.DisplayName ?? user.DisplayName;
-                        await _userManager.UpdateAsync(user);
+                    "Shop" => "Shop",
+                    "Supplier" => "Supplier",
+                    _ => "Individual"
+                };
+
+                // 🔧 **التأكد من وجود الدور أولاً**
+                var roleExists = await _userManager.IsInRoleAsync(user, roleName);
+                if (!roleExists)
+                {
+                    var addRoleResult = await _userManager.AddToRoleAsync(user, roleName);
+                    if (!addRoleResult.Succeeded)
+                    {
+                        _logger.LogWarning($"Failed to add user to role {roleName}");
+                    }
+                }
+
+                // 🔧 **معالجة طلب الموردين (بدون إرسال بريد)**
+                if (Input.AccountType == "Supplier")
+                {
+                    try
+                    {
                         var app = new SupplierApplication
                         {
                             UserId = user.Id,
@@ -137,40 +179,45 @@ namespace Rain.Web.Areas.Identity.Pages.Account
                             ResidenceLocation = Input.ResidenceLocation ?? string.Empty,
                             ExactLocation = Input.ExactLocation ?? string.Empty,
                             PlanType = Input.PlanType,
-                            Status = SupplierApplicationStatus.Pending
+                            Status = SupplierApplicationStatus.Pending,
+                            CreatedAtUtc = DateTime.UtcNow
                         };
                         _db.SupplierApplications.Add(app);
                         await _db.SaveChangesAsync();
-                        // notify admin about new supplier application
-                        var adminEmail = _cfg["Admin:Email"] ?? "admin@rain.local";
-                        await _emailSender.SendEmailAsync(adminEmail, "طلب مورد جديد", $"تم استلام طلب مورد جديد من: {Input.DisplayName ?? Input.FullName ?? Input.Email}.\nالبريد: {Input.Email}\nالخطة: {Input.PlanType}");
-                        TempData["Info"] = "تم استلام طلبك كمورّد. بانتظار موافقة الإدارة لمنح الصلاحيات.";
-                        break;
-                    default:
-                        user.UserType = UserType.Individual;
-                        await _userManager.UpdateAsync(user);
-                        await _userManager.AddToRoleAsync(user, "Individual");
-                        break;
+                        
+                        TempData["Info"] = "تم استلام طلبك كمورّد. يمكنك استخدام الموقع كزائر حتى موافقة الإدارة.";
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error creating supplier application");
+                        TempData["Info"] = "تم إنشاء الحساب بنجاح! سيتم مراجعة طلب المورد قريباً.";
+                    }
+                }
+                else
+                {
+                    TempData["Success"] = "تم إنشاء الحساب وتسجيل الدخول بنجاح!";
                 }
 
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                var callbackUrl = Url.Page(
-                    "/Account/ConfirmEmail",
-                    pageHandler: null,
-                    values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
-                    protocol: Request.Scheme) ?? string.Empty;
+                // 🔧 **تجاهل إرسال بريد التأكيد (لأننا قمنا بتأكيده تلقائياً)**
+                // لا نرسل أي بريد تأكيد
 
-                await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
-                TempData["Info"] = "تم إنشاء الحساب. يرجى تأكيد البريد الإلكتروني عبر الرابط المرسل.";
-                return RedirectToPage("./Login");
+                // 🔧 **إعادة التوجيه إلى الصفحة الرئيسية**
+                return LocalRedirect(returnUrl);
             }
+            
+            // 🔧 **معالجة الأخطاء بشكل أفضل**
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
+                _logger.LogError($"Registration error: {error.Description}");
             }
+            
+            // 🔧 **إضافة رسالة خطأ عامة**
+            if (result.Errors.Any())
+            {
+                TempData["Error"] = "حدث خطأ أثناء إنشاء الحساب. الرجاء التحقق من البيانات والمحاولة مرة أخرى.";
+            }
+            
             return Page();
         }
     }
