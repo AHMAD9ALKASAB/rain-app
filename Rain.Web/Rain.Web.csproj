@@ -9,6 +9,9 @@
     <!-- حزمة PostgreSQL للنشر على Render -->
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     
+    <!-- حزمة لتجنب التحذير -->
+    <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
+    
     <!-- الحزم الموجودة أصلاً -->
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.6" />
@@ -27,6 +30,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>8a2819b2-fe96-4a96-b533-e70d9bc83d34</UserSecretsId>
+    <!-- تجاهل تحذير TrustServerCertificate -->
+    <NoWarn>$(NoWarn);CS0618</NoWarn>
   </PropertyGroup>
 
 </Project>

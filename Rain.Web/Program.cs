@@ -10,6 +10,7 @@ using Rain.Infrastructure.Payments;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Rain.Infrastructure.Seed;
 using Npgsql;
+using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,28 +67,68 @@ builder.Services.AddScoped<IPaymentProvider>(sp =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Server=(localdb)\\MSSQLLocalDB;Database=RainDb;Trusted_Connection=True;TrustServerCertificate=True";
 
-// تحويل PostgreSQL URL من Render إلى صيغة قابلة للاستخدام
+// **تحويل PostgreSQL URL من Render إلى صيغة قابلة للاستخدام - الإصلاح النهائي**
 if (connectionString.StartsWith("postgresql://"))
 {
     try
     {
-        var databaseUri = new Uri(connectionString);
-        var userInfo = databaseUri.UserInfo.Split(':');
-        connectionString = new NpgsqlConnectionStringBuilder
+        // استخدام Regex لتحليل الرابط يدوياً لأن Uri لا يتعامل مع الروابط بدون منفذ
+        var match = Regex.Match(connectionString, 
+            @"postgresql://([^:]+):([^@]+)@([^/]+)/([^?]+)");
+        
+        if (match.Success)
         {
-            Host = databaseUri.Host,
-            Port = databaseUri.Port,
-            Username = userInfo[0],
-            Password = userInfo[1],
-            Database = databaseUri.LocalPath.TrimStart('/'),
-            SslMode = SslMode.Require,
-            TrustServerCertificate = true
-        }.ToString();
-        Console.WriteLine($"✅ PostgreSQL connection string parsed successfully");
+            var username = match.Groups[1].Value;
+            var password = match.Groups[2].Value;
+            var host = match.Groups[3].Value;
+            var database = match.Groups[4].Value;
+            
+            // أضف النطاق الكامل إذا كان من Render
+            if (host.Contains("dpg-") && !host.Contains("."))
+            {
+                host = host + ".oregon-postgres.render.com";
+            }
+            
+            connectionString = new NpgsqlConnectionStringBuilder
+            {
+                Host = host,
+                Port = 5432, // المنفذ الافتراضي لـ PostgreSQL
+                Database = database,
+                Username = username,
+                Password = password,
+                SslMode = SslMode.Require,
+                TrustServerCertificate = false // هذه القيمة لم تعد ضرورية
+            }.ToString();
+            
+            Console.WriteLine($"✅ PostgreSQL connection string parsed successfully for {host}");
+        }
+        else
+        {
+            Console.WriteLine($"❌ Failed to parse PostgreSQL URL with Regex");
+        }
     }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Error parsing PostgreSQL URL: {ex.Message}");
+        Console.WriteLine($"❌ Original URL: {connectionString}");
+        
+        // محاولة بديلة: استخدم الصيغة المباشرة
+        try
+        {
+            connectionString = connectionString.Replace("postgresql://", "")
+                .Replace("@", ";Username=").Replace(":", ";Password=", 1)
+                .Replace("/", ";Database=") + ";Port=5432;SSL Mode=Require";
+            
+            // إضافة النطاق الكامل
+            if (connectionString.Contains("dpg-") && !connectionString.Contains("oregon-postgres.render.com"))
+            {
+                connectionString = connectionString.Replace("dpg-", "dpg-").Replace(";Host=", ";Host=") + ".oregon-postgres.render.com";
+            }
+        }
+        catch (Exception ex2)
+        {
+            Console.WriteLine($"❌ Alternative parsing also failed: {ex2.Message}");
+        }
     }
 }
 
@@ -96,8 +137,8 @@ var isPostgresConnection = connectionString.Contains("Host=") ||
                           connectionString.Contains("postgres") ||
                           connectionString.Contains("dpg-");
 
-Console.WriteLine($"📊 Connection String: {connectionString}");
 Console.WriteLine($"📊 Is PostgreSQL: {isPostgresConnection}");
+Console.WriteLine($"📊 Connection String length: {connectionString?.Length ?? 0}");
 
 // تخزين القيم لاستخدامها لاحقاً
 var isPostgres = isPostgresConnection;
@@ -245,7 +286,7 @@ using (var scope = app.Services.CreateScope())
         }
         else
         {
-            // لـ SQL Server: استخدم الهجرات
+            // لـ SQL Server: استخدام الهجرات
             logger.LogInformation("🔧 Applying SQL Server migrations...");
             await context.Database.MigrateAsync();
             logger.LogInformation("✅ SQL Server migrations applied");
@@ -264,4 +305,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.Run();
+// ============ إصلاح مشكلة البورت في Render ============
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+app.Run($"http://0.0.0.0:{port}");
