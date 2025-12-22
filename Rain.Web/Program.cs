@@ -342,7 +342,12 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 🔧 **Middleware لإصلاح مشاكل returnUrl**
+// Request localization
+var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(localizationOptions.Value);
+
+// 🔧 **إصلاح مشكلة QueryString - تم تحديث الكود**
+// Middleware لإصلاح مشاكل returnUrl بدون أخطاء QueryString
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.Value ?? "";
@@ -356,18 +361,20 @@ app.Use(async (context, next) =>
             var returnUrl = context.Request.Query["returnUrl"].FirstOrDefault();
             if (string.IsNullOrEmpty(returnUrl))
             {
-                // تعيين returnUrl افتراضي
-                context.Request.QueryString = new QueryString($"{context.Request.QueryString}&returnUrl=%2F");
+                // إعادة توجيه بسيطة مع returnUrl بدلاً من تعديل QueryString مباشرة
+                // هذا أكثر أماناً ولا يسبب أخطاء QueryString
+                var newQuery = string.IsNullOrEmpty(query) 
+                    ? "?returnUrl=%2F" 
+                    : $"{query}&returnUrl=%2F";
+                
+                // إنشاء QueryString بشكل صحيح
+                context.Request.QueryString = QueryString.FromUriComponent(newQuery);
             }
         }
     }
     
     await next();
 });
-
-// Request localization
-var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
-app.UseRequestLocalization(localizationOptions.Value);
 
 // Guard: Suppliers can only access ChangePassword under Identity Manage
 app.Use(async (context, next) =>
