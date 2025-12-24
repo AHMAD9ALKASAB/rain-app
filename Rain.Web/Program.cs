@@ -408,7 +408,7 @@ app.Use(async (context, next) =>
         "img-src 'self' data: https:",
         "font-src 'self' data: https:",
         "frame-src 'self' https://www.google.com",
-        "connect-src 'self' https://api.openai.com"
+        "connect-src 'self' https://api.openai.com https://cdn.jsdelivr.net https://code.jquery.com"
     });
     
     context.Response.Headers["Content-Security-Policy"] = csp;
