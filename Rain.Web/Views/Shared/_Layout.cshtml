@@ -17,10 +17,10 @@
     <!-- حذف سطر importmap الفارغ أو تركه -->
     <!-- Bootstrap 5 محلي -->
     <link rel="stylesheet" href="~/lib/bootstrap/css/@(dir == "rtl" ? "bootstrap.rtl.min.css" : "bootstrap.min.css")" asp-append-version="true" />
-    
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css" asp-append-version="true" />
+
     <!-- ملفات CSS المحلية -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
