@@ -4,11 +4,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Rain.Web.Services
 {
-    public class RainNoOpEmailSender : IEmailSender
+    public class NoOpEmailSender : IEmailSender
     {
-        private readonly ILogger<RainNoOpEmailSender>? _logger;
+        private readonly ILogger<NoOpEmailSender> _logger;
 
-        public RainNoOpEmailSender(ILogger<RainNoOpEmailSender>? logger = null)
+        public NoOpEmailSender(ILogger<NoOpEmailSender> logger = null)
         {
             _logger = logger;
         }
@@ -16,6 +16,7 @@ namespace Rain.Web.Services
         public Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             _logger?.LogInformation("Email would be sent to {Email} with subject: {Subject}", email, subject);
+            _logger?.LogDebug("Email content: {Content}", htmlMessage);
             
             // لا تفعل شيئًا - فقط لأغراض التطوير
             return Task.CompletedTask;

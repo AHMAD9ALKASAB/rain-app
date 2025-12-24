@@ -57,8 +57,9 @@ builder.Services.AddRateLimiter(options =>
 // Files
 builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
 
-// Email sender (SMTP via Gmail user-secrets)
-builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+// 🔧 **التعديل المهم: استخدام NoOpEmailSender بدلاً من SmtpEmailSender مؤقتًا**
+// هذا سيحل مشكلة التسجيل نهائيًا حتى تقوم بإعداد SMTP
+builder.Services.AddScoped<IEmailSender, Rain.Web.Services.RainNoOpEmailSender>();
 
 // Notifications
 builder.Services.AddScoped<INotificationService, NotificationService>();

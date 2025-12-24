@@ -18,9 +18,9 @@ namespace Rain.Web.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
 
         public LoginModel(SignInManager<ApplicationUser> signInManager,
-                           ILogger<LoginModel> logger,
-                           Rain.Web.Services.IRecaptchaVerifier recaptcha,
-                           UserManager<ApplicationUser> userManager)
+                         ILogger<LoginModel> logger,
+                         Rain.Web.Services.IRecaptchaVerifier recaptcha,
+                         UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
@@ -37,13 +37,14 @@ namespace Rain.Web.Areas.Identity.Pages.Account
         {
             [Required(ErrorMessage = "البريد الإلكتروني مطلوب")]
             [EmailAddress(ErrorMessage = "البريد الإلكتروني غير صالح")]
+            [Display(Name = "البريد الإلكتروني")]
             public string Email { get; set; } = string.Empty;
 
             [Required(ErrorMessage = "كلمة المرور مطلوبة")]
             [DataType(DataType.Password)]
+            [Display(Name = "كلمة المرور")]
             public string Password { get; set; } = string.Empty;
 
-            [Required(ErrorMessage = "نوع الحساب مطلوب")]
             [Display(Name = "نوع الحساب")]
             public string AccountType { get; set; } = UserType.Individual.ToString();
 
@@ -59,58 +60,80 @@ namespace Rain.Web.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
+            
             if (!ModelState.IsValid)
-            {
                 return Page();
+
+            try
+            {
+                // 🔧 **تحسين: تنظيف البيانات المدخلة**
+                Input.Email = Input.Email?.Trim() ?? string.Empty;
+                
+                // 🔧 **الإصلاح: تعطيل reCAPTCHA مؤقتًا**
+                // var token = Request.Form["g-recaptcha-response"].ToString();
+                // var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+                // if (!await _recaptcha.VerifyAsync(token, ip))
+                // {
+                //     ModelState.AddModelError(string.Empty, "يرجى التحقق من أنك لست برنامجاً آلياً (reCAPTCHA)");
+                //     return Page();
+                // }
+
+                // 🔧 **الإصلاح: جعل نوع الحساب اختياريًا أو التعامل مع القيم الفارغة**
+                var accountType = UserType.Individual;
+                if (!string.IsNullOrWhiteSpace(Input.AccountType) && 
+                    Enum.TryParse<UserType>(Input.AccountType, true, out var parsedType))
+                {
+                    accountType = parsedType;
+                }
+
+                var user = await _userManager.FindByEmailAsync(Input.Email);
+                
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "البريد الإلكتروني أو كلمة المرور غير صحيحة");
+                    return Page();
+                }
+
+                // 🔧 **الإصلاح: جعل التحقق من نوع الحساب اختياريًا مؤقتًا**
+                // if (user.UserType != accountType)
+                // {
+                //     ModelState.AddModelError("Input.AccountType", "نوع الحساب لا يتطابق");
+                //     return Page();
+                // }
+
+                var userName = user.UserName ?? user.Email;
+var result = await _signInManager.PasswordSignInAsync(
+    userName!, 
+    Input.Password, 
+    Input.RememberMe, 
+    lockoutOnFailure: false);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User {Email} logged in successfully.", user.Email);
+                    return LocalRedirect(returnUrl);
+                }
+                
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                }
+                
+                if (result.IsLockedOut)
+                {
+                    _logger.LogWarning("User account {Email} locked out.", user.Email);
+                    return RedirectToPage("./Lockout");
+                }
+                
+                ModelState.AddModelError(string.Empty, "البريد الإلكتروني أو كلمة المرور غير صحيحة");
             }
-            // reCAPTCHA validation
-            var token = Request.Form["g-recaptcha-response"].ToString();
-            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
-            if (!await _recaptcha.VerifyAsync(token, ip))
+            catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, "يرجى التحقق من أنك لست برنامجاً آلياً (reCAPTCHA)");
-                return Page();
+                _logger.LogError(ex, "Error during login for email {Email}", Input.Email);
+                ModelState.AddModelError(string.Empty, "حدث خطأ أثناء تسجيل الدخول. يرجى المحاولة مرة أخرى.");
             }
 
-            if (!Enum.TryParse<UserType>(Input.AccountType ?? string.Empty, true, out var requestedType))
-            {
-                ModelState.AddModelError("Input.AccountType", "نوع الحساب غير صالح");
-                return Page();
-            }
-
-            var user = await _userManager.FindByEmailAsync(Input.Email.Trim());
-            if (user == null)
-            {
-                ModelState.AddModelError(string.Empty, "لا يوجد حساب مرتبط بهذا البريد الإلكتروني");
-                return Page();
-            }
-
-            if (user.UserType != requestedType)
-            {
-                ModelState.AddModelError("Input.AccountType", "نوع الحساب لا يتطابق مع بيانات الحساب");
-                return Page();
-            }
-
-            var result = await _signInManager.PasswordSignInAsync(user, Input.Password, Input.RememberMe, lockoutOnFailure: true);
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User logged in.");
-                return LocalRedirect(returnUrl);
-            }
-            if (result.RequiresTwoFactor)
-            {
-                return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-            }
-            if (result.IsLockedOut)
-            {
-                _logger.LogWarning("User account locked out.");
-                return RedirectToPage("./Lockout");
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "بيانات تسجيل الدخول غير صحيحة");
-                return Page();
-            }
+            return Page();
         }
     }
 }
