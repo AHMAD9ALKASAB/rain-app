@@ -136,7 +136,9 @@ namespace Rain.Infrastructure.Seed
                 new Product { Name = "طقم أواني Casa", CategoryId = cats.First(c=>c.Name=="المنزل").Id, BrandId = brands.First(b=>b.Name=="CasaPlus").Id, Description = "متين وسهل التنظيف" },
                 new Product { Name = "مصباح مكتبي LED", CategoryId = cats.First(c=>c.Name=="المنزل").Id, BrandId = brands.First(b=>b.Name=="CasaPlus").Id, Description = "إضاءة مريحة للعين" },
                 new Product { Name = "مجفف شعر", CategoryId = cats.First(c=>c.Name=="العناية والجمال").Id, BrandId = brands.First(b=>b.Name=="CasaPlus").Id, Description = "تقنية حماية الشعر" },
-                new Product { Name = "معدات لياقة FitPro", CategoryId = cats.First(c=>c.Name=="الرياضة").Id, BrandId = brands.First(b=>b.Name=="FitPro").Id, Description = "تحمل عالي" }
+                new Product { Name = "معدات لياقة FitPro", CategoryId = cats.First(c=>c.Name=="الرياضة").Id, BrandId = brands.First(b=>b.Name=="FitPro").Id, Description = "تحمل عالي" },
+                new Product { Name = "حاسوب محمول RainBook", CategoryId = cats.First(c=>c.Name=="الإلكترونيات").Id, BrandId = brands.First(b=>b.Name=="RainTech").Id, Description = "شاشة 14 بوصة مع بطاقة رسومات مدمجة" },
+                new Product { Name = "كاميرا رقمية VisionPro", CategoryId = cats.First(c=>c.Name=="الإلكترونيات").Id, BrandId = brands.First(b=>b.Name=="RainTech").Id, Description = "مستشعر 24 ميغابكسل مع تثبيت بصري" }
             };
             var existingProductNames = await db.Products.Select(p => p.Name).ToListAsync();
             var toAddProducts = demoProducts.Where(p => !existingProductNames.Contains(p.Name)).ToList();

@@ -1,0 +1,180 @@
+/* Account management dashboard styles */
+:root {
+  --account-gradient: linear-gradient(120deg, #1f2937 0%, #0f172a 40%, #111827 100%);
+  --account-secondary: #22d3ee;
+  --account-muted: #94a3b8;
+  --account-border: rgba(148, 163, 184, .25);
+}
+
+.account-manage-hero {
+  background: var(--account-gradient);
+  border-radius: 32px;
+  color: #f8fafc;
+  position: relative;
+  overflow: hidden;
+  padding: 2.5rem;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, .45);
+}
+
+.account-manage-hero::after,
+.account-manage-hero::before {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: .4;
+}
+
+.account-manage-hero::after {
+  width: 240px;
+  height: 240px;
+  background: rgba(14, 165, 233, .7);
+  top: -80px;
+  inset-inline-end: -40px;
+}
+
+.account-manage-hero::before {
+  width: 180px;
+  height: 180px;
+  background: rgba(248, 113, 113, .5);
+  bottom: -40px;
+  inset-inline-start: -30px;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  border-radius: 999px;
+  padding: .35rem .9rem;
+  font-size: .85rem;
+  background: rgba(255, 255, 255, .12);
+  color: #f8fafc;
+}
+
+.status-chip i {
+  font-size: .9rem;
+}
+
+.account-card {
+  border-radius: 24px;
+  border: 1px solid var(--account-border);
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, .08);
+  padding: 1.75rem;
+}
+
+.account-card h5,
+.account-card h6 {
+  font-weight: 600;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .8rem 0;
+  border-bottom: 1px dashed rgba(148, 163, 184, .4);
+}
+
+.summary-item:last-child {
+  border-bottom: 0;
+}
+
+.summary-item span:first-child {
+  color: var(--account-muted);
+  font-size: .9rem;
+}
+
+.summary-item span:last-child {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.stat-pill {
+  padding: 1rem 1.25rem;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, .03);
+  border: 1px solid rgba(148, 163, 184, .4);
+}
+
+.stat-pill strong {
+  display: block;
+  font-size: 1.35rem;
+  color: #0f172a;
+}
+
+.addresses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.address-card {
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, .35);
+  padding: 1rem 1.25rem;
+}
+
+.address-card.is-default {
+  border-color: #0ea5e9;
+  background: rgba(14, 165, 233, .06);
+}
+
+.address-card h6 {
+  font-weight: 600;
+}
+
+.orders-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.order-item {
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, .3);
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.order-item .badge {
+  font-weight: 600;
+}
+
+.order-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-inline-end: .35rem;
+}
+
+.status-pending { background: #f97316; }
+.status-accepted { background: #3b82f6; }
+.status-shipped { background: #0ea5e9; }
+.status-delivered { background: #22c55e; }
+.status-cancelled { background: #ef4444; }
+
+.settings-form .form-label {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.settings-form .form-control {
+  border-radius: 14px;
+  padding-inline: 1rem;
+}
+
+@media (max-width: 767.98px) {
+  .account-manage-hero {
+    border-radius: 24px;
+    padding: 1.75rem;
+  }
+  .account-card {
+    padding: 1.25rem;
+  }
+}

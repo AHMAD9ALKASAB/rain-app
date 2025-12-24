@@ -15,8 +15,8 @@
     <link rel="apple-touch-icon" href="/images/logo.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <!-- حذف سطر importmap الفارغ أو تركه -->
-    <!-- Bootstrap 5 من CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <!-- Bootstrap 5 محلي -->
+    <link rel="stylesheet" href="~/lib/bootstrap/css/@(dir == "rtl" ? "bootstrap.rtl.min.css" : "bootstrap.min.css")" asp-append-version="true" />
     
     <!-- ملفات CSS المحلية -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -72,11 +72,9 @@
         </div>
     </footer>
     
-    <!-- 🔧 **التعديل: jQuery من CDN بدلاً من المحلي -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    
-    <!-- Bootstrap JS من CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <!-- jQuery و Bootstrap محلياً -->
+    <script src="~/lib/jquery/jquery-3.7.1.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
     
     <!-- ملفات JS المحلية -->
     <script src="~/js/site.js" asp-append-version="true"></script>

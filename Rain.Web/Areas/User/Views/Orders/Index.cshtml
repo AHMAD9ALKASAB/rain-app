@@ -1,35 +1,161 @@
 @using Rain.Domain.Entities
+@using Rain.Domain.Enums
 @model List<Order>
 @{
     ViewData["Title"] = "طلباتي";
+    var totalOrders = Model.Count;
+    var deliveredOrders = Model.Count(o => o.Status == OrderStatus.Delivered);
+    var pendingOrders = Model.Count(o => o.Status == OrderStatus.Pending);
+    var totalSpent = Model.Sum(o => o.Total);
+    var lastOrderDate = Model.OrderByDescending(o => o.CreatedAt).FirstOrDefault()?.CreatedAt.ToLocalTime();
+
+    string StatusClass(OrderStatus status) => status switch
+    {
+        OrderStatus.Pending => "status-pending",
+        OrderStatus.Accepted => "status-accepted",
+        OrderStatus.Shipped => "status-shipped",
+        OrderStatus.Delivered => "status-delivered",
+        OrderStatus.Cancelled => "status-cancelled",
+        _ => "status-pending"
+    };
+
+    string StatusLabel(OrderStatus status) => status switch
+    {
+        OrderStatus.Pending => "قيد المراجعة",
+        OrderStatus.Accepted => "تم القبول",
+        OrderStatus.Shipped => "جارٍ الشحن",
+        OrderStatus.Delivered => "تم التسليم",
+        OrderStatus.Cancelled => "ملغي",
+        _ => status.ToString()
+    };
 }
-<div class="container py-3">
-    <h3 class="mb-3">طلباتي</h3>
-    <div class="table-responsive">
-        <table class="table table-sm align-middle">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>التاريخ</th>
-                    <th>الإجمالي</th>
-                    <th>الحالة</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var o in Model)
-            {
-                <tr>
-                    <td>@o.Id</td>
-                    <td>@o.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</td>
-                    <td>@o.Total.ToString("0.00")</td>
-                    <td>@o.Status</td>
-                    <td>
-                        <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details", new { id = o.Id })">تفاصيل</a>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/orders.css" asp-append-version="true" />
+}
+
+<div class="container py-4 py-lg-5">
+    <div class="orders-hero mb-5">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6">
+                <p class="text-uppercase small mb-2">لوحة الطلبات</p>
+                <h2 class="fw-bold mb-2">رحلتك الشرائية بضغطة واحدة</h2>
+                <p class="mb-0 text-white-75">تابع حالة الطلبات، إعرف قيمة مشترياتك، وتابع آخر التحديثات بسهولة.</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="stat-pill">
+                            <span>إجمالي الطلبات</span>
+                            <strong>@totalOrders</strong>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-pill">
+                            <span>طلبات منجزة</span>
+                            <strong>@deliveredOrders</strong>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-pill">
+                            <span>مبالغ الإنفاق</span>
+                            <strong>@totalSpent.ToString("N0") ل.س</strong>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stat-pill">
+                            <span>أحدث طلب</span>
+                            <strong>@(lastOrderDate?.ToString("yyyy/MM/dd") ?? "—")</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    @if (!Model.Any())
+    {
+        <div class="orders-empty">
+            <img src="~/images/products/order-empty.jpg" alt="Empty orders" class="mb-3" />
+            <h4 class="fw-semibold mb-2">لا توجد طلبات بعد</h4>
+            <p class="text-muted mb-4">ابدأ التسوق من قسم المنتجات، واختر العرض الأنسب لك.</p>
+            <a class="btn btn-primary rounded-pill px-4" asp-area="" asp-controller="Products" asp-action="Index">استكشاف المنتجات</a>
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-column gap-4">
+            @foreach (var order in Model.OrderByDescending(o => o.CreatedAt))
+            {
+                <div class="order-card">
+                    <div class="order-card__header">
+                        <div>
+                            <h5>الطلب رقم #@order.Id</h5>
+                            <span class="text-muted small">@order.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</span>
+                        </div>
+                        <span class="order-status-badge @StatusClass(order.Status)">
+                            <i class="fas fa-circle-dot"></i> @StatusLabel(order.Status)
+                        </span>
+                    </div>
+
+                    <div class="order-meta">
+                        <div class="meta-box">
+                            <span>الإجمالي</span>
+                            <strong>@order.Total.ToString("N0") ل.س</strong>
+                        </div>
+                        <div class="meta-box">
+                            <span>العناصر</span>
+                            <strong>@order.Items.Sum(i => i.Quantity)</strong>
+                        </div>
+                        <div class="meta-box">
+                            <span>العنوان</span>
+                            <strong>@(order.ShippingAddress?.City ?? "—")</strong>
+                        </div>
+                    </div>
+
+                    <div class="order-timeline">
+                        @{
+                            var steps = new[]
+                            {
+                                OrderStatus.Pending,
+                                OrderStatus.Accepted,
+                                OrderStatus.Shipped,
+                                OrderStatus.Delivered
+                            };
+                        }
+                        @foreach (var step in steps)
+                        {
+                            var active = (int)order.Status >= (int)step;
+                            <div class="timeline-step @(active ? "active" : null)">
+                                <span class="dot"></span>
+                                <span>@StatusLabel(step)</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="text-muted small">
+                            @order.Items.FirstOrDefault()?.SupplierOffer?.Product?.Name ?? "—"
+                            @if (order.Items.Count > 1)
+                            {
+                                <span>و @((order.Items.Count) - 1) منتج آخر</span>
+                            }
+                        </div>
+                        <div class="d-flex gap-2">
+                            @if (order.Status == OrderStatus.Shipped)
+                            {
+                                <form method="post" asp-area="User" asp-controller="Orders" asp-action="ConfirmDelivery" asp-route-id="@order.Id">
+                                    @Html.AntiForgeryToken()
+                                    <button class="btn btn-success btn-sm rounded-pill px-3">تأكيد الاستلام</button>
+                                </form>
+                            }
+                            <a class="btn btn-outline-primary rounded-pill" href="@Url.Action("Details", new { id = order.Id })">
+                                عرض التفاصيل
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>

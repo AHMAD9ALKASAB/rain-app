@@ -2,6 +2,30 @@
 @model Product
 @{
     ViewData["Title"] = Model.Name;
+    var fallbackImages = ViewBag.FallbackImages as IDictionary<string, string> ?? new Dictionary<string, string>();
+    var currencyRates = ViewBag.CurrencyRates as IDictionary<string, decimal> ?? new Dictionary<string, decimal>();
+    string ResolveImage()
+    {
+        var first = Model.Images?.FirstOrDefault()?.Url;
+        if (!string.IsNullOrWhiteSpace(first))
+        {
+            return first!;
+        }
+        if (fallbackImages.TryGetValue(Model.Name, out var fallback))
+        {
+            return fallback;
+        }
+        return $"https://images.unsplash.com/seed/rain-{Model.Id}/1200x900?auto=format&fit=crop&bg=fff&product";
+    }
+
+    decimal? ToSyp(Rain.Domain.Entities.SupplierOffer? offer)
+    {
+        if (offer == null) return null;
+        var currency = string.IsNullOrWhiteSpace(offer.Currency) ? "SYP" : offer.Currency.Trim().ToUpperInvariant();
+        return currencyRates.TryGetValue(currency, out var rate)
+            ? Math.Round(offer.Price * rate, 0)
+            : null;
+    }
 }
 
 @section Styles {
@@ -14,6 +38,8 @@
     var activeOffers = Model.SupplierOffers?.Where(o => o.IsActive).OrderBy(o => o.Price).ToList()
         ?? new System.Collections.Generic.List<SupplierOffer>();
     var bestOffer = activeOffers.FirstOrDefault();
+    var bestOfferSyp = ToSyp(bestOffer);
+    var heroImage = ResolveImage();
 }
 
 <div class="product-details-hero text-white py-5 mb-5">
@@ -35,6 +61,12 @@
                         <div>
                             <span class="text-uppercase small text-white-50">أفضل سعر</span>
                             <div class="display-6 fw-bold">@bestOffer.Price.ToString("0.00") <small class="fs-5">@bestOffer.Currency</small></div>
+                            @if (bestOfferSyp.HasValue)
+                            {
+                                <div class="text-white-50 small">
+                                    ≈ @bestOfferSyp.Value.ToString("N0") ل.س
+                                </div>
+                            }
                         </div>
                         <a class="btn btn-light rounded-pill px-4" href="@Url.Action("Create","Orders", new { area = "User", offerId = bestOffer.Id })">
                             اطلب الآن <i class="fas fa-arrow-left ms-2"></i>
@@ -44,12 +76,11 @@
             </div>
             <div class="col-lg-5">
                 <div class="product-gallery rounded-5 shadow p-3 bg-white">
+                    <div class="ratio ratio-4x3 rounded-4 overflow-hidden mb-3">
+                        <img src="@heroImage" alt="@Model.Name" class="w-100 h-100 object-fit-cover" />
+                    </div>
                     @if (Model.Images?.Any() == true)
                     {
-                        var cover = Model.Images.First();
-                        <div class="ratio ratio-4x3 rounded-4 overflow-hidden mb-3">
-                            <img src="@cover.Url" alt="@Model.Name" class="w-100 h-100 object-fit-cover" />
-                        </div>
                         <div class="product-gallery-thumbs d-flex gap-2">
                             @foreach (var img in Model.Images.Take(4))
                             {
@@ -57,15 +88,6 @@
                                     <img src="@img.Url" alt="@Model.Name" class="w-100 h-100 object-fit-cover" />
                                 </div>
                             }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="ratio ratio-4x3 rounded-5 bg-light d-flex align-items-center justify-content-center">
-                            <div class="gallery-placeholder text-center">
-                                <i class="fas fa-cube fa-2x text-muted mb-2"></i>
-                                <p class="text-muted mb-0">صورة المنتج</p>
-                            </div>
                         </div>
                     }
                 </div>
@@ -130,6 +152,13 @@
                                         </div>
                                         <div class="text-end">
                                             <div class="fs-4 fw-bold">@offer.Price.ToString("0.00") <small class="fs-6">@offer.Currency</small></div>
+                                            @{
+                                                var syp = ToSyp(offer);
+                                                if (syp.HasValue)
+                                                {
+                                                    <div class="text-muted small">≈ @syp.Value.ToString("N0") ل.س</div>
+                                                }
+                                            }
                                             @if (offer.AverageRating > 0)
                                             {
                                                 <div class="text-warning small">

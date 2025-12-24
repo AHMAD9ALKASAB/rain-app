@@ -1,0 +1,26 @@
+:root{--auth-bg1:#0ea5e9;--auth-bg2:#4f46e5;--auth-card-bg:rgba(255,255,255,0.9);--auth-card-bg-dark:rgba(0,0,0,0.55);--auth-blur:14px}
+.auth-wrap{min-height:calc(100vh - 160px);position:relative;background:linear-gradient(135deg,var(--auth-bg1),var(--auth-bg2));display:flex;align-items:center}
+.auth-deco{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.auth-deco span{position:absolute;border-radius:999px;filter:blur(60px);opacity:.35}
+.auth-deco .s1{width:360px;height:360px;background:#22d3ee;top:-80px;left:-80px}
+.auth-deco .s2{width:420px;height:420px;background:#a78bfa;bottom:-120px;right:-100px}
+.auth-wrap.theme-individual{--auth-bg1:#0ea5e9;--auth-bg2:#4f46e5}
+.auth-wrap.theme-shop{--auth-bg1:#22c55e;--auth-bg2:#16a34a}
+.auth-wrap.theme-supplier{--auth-bg1:#f59e0b;--auth-bg2:#d97706}
+.auth-card{backdrop-filter:blur(var(--auth-blur));-webkit-backdrop-filter:blur(var(--auth-blur));background:var(--auth-card-bg);border:1px solid rgba(255,255,255,.5);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+[data-bs-theme="dark"] .auth-card{background:var(--auth-card-bg-dark);border-color:rgba(255,255,255,.1)}
+.auth-title{font-weight:800;letter-spacing:.3px}
+.auth-sub{color:#475569}
+[data-bs-theme="dark"] .auth-sub{color:#94a3b8}
+.auth-input .form-control{border-radius:12px;border:1px solid #e2e8f0;padding-top:14px;padding-bottom:14px}
+.auth-input .form-control:focus{box-shadow:0 0 0 .25rem rgba(14,165,233,.2);border-color:#0ea5e9}
+.btn-auth-primary{background:linear-gradient(135deg,#0ea5e9,#4f46e5);border:none}
+.btn-auth-primary:hover{filter:brightness(1.05)}
+.fade-up{animation:fadeUp .6s ease both}
+@keyframes fadeUp{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+.badge-type{border-radius:999px;padding:.35rem .6rem;font-weight:600;background:rgba(14,165,233,.12);color:#0ea5e9}
+/* Icon badge */
+.icon-badge{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;margin-inline-start:8px}
+.theme-individual .icon-badge{background:rgba(14,165,233,.15);color:#0284c7}
+.theme-shop .icon-badge{background:rgba(34,197,94,.15);color:#15803d}
+.theme-supplier .icon-badge{background:rgba(245,158,11,.15);color:#b45309}

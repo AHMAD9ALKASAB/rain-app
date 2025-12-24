@@ -16,6 +16,30 @@
     decimal? minPrice = ViewBag.MinPrice as decimal?;
     decimal? maxPrice = ViewBag.MaxPrice as decimal?;
     double? minRating = ViewBag.MinRating as double?;
+    var fallbackImages = ViewBag.FallbackImages as IDictionary<string, string> ?? new Dictionary<string, string>();
+    var currencyRates = ViewBag.CurrencyRates as IDictionary<string, decimal> ?? new Dictionary<string, decimal>();
+    string ResolveImage(Product product)
+    {
+        var firstImage = product.Images?.FirstOrDefault()?.Url;
+        if (!string.IsNullOrWhiteSpace(firstImage))
+        {
+            return firstImage!;
+        }
+        if (fallbackImages.TryGetValue(product.Name, out var fallback))
+        {
+            return fallback;
+        }
+        return $"https://images.unsplash.com/seed/rain-{product.Id}/640x640?auto=format&fit=crop&bg=fff&product";
+    }
+
+    decimal? ToSyp(SupplierOffer? offer)
+    {
+        if (offer == null) return null;
+        var currency = string.IsNullOrWhiteSpace(offer.Currency) ? "SYP" : offer.Currency.Trim().ToUpperInvariant();
+        return currencyRates.TryGetValue(currency, out var rate)
+            ? Math.Round(offer.Price * rate, 0)
+            : null;
+    }
 }
 
 @section Styles {
@@ -126,7 +150,8 @@
                     var activeOffers = item.SupplierOffers?.Where(o => o.IsActive).ToList() ?? new List<SupplierOffer>();
                     var minOffer = activeOffers.OrderBy(o => o.Price).FirstOrDefault();
                     var topRated = activeOffers.Where(o => o.RatingsCount > 0).OrderByDescending(o => o.AverageRating).FirstOrDefault();
-                    var heroImage = item.Images?.FirstOrDefault()?.Url ?? $"https://images.unsplash.com/seed/rain-{item.Id}/640x640?auto=format&fit=crop&bg=fff&product";
+                    var heroImage = ResolveImage(item);
+                    var minOfferSyp = ToSyp(minOffer);
                     var offersCount = activeOffers.Count;
                     <div class="col-12 col-sm-6 col-xl-4">
                         <div class="product-card h-100 rounded-4 shadow-sm d-flex flex-column">
@@ -168,6 +193,12 @@
                                         <div>
                                             <span class="price">@minOffer.Price.ToString("0.00")</span>
                                             <small class="text-muted">@minOffer.Currency</small>
+                                            @if (minOfferSyp.HasValue)
+                                            {
+                                                <div class="text-muted small">
+                                                    ≈ @minOfferSyp.Value.ToString("N0") ل.س
+                                                </div>
+                                            }
                                         </div>
                                     }
                                     else

@@ -1,0 +1,210 @@
+@page
+@using Rain.Domain.Enums
+@model Rain.Web.Areas.Identity.Pages.Account.Manage.IndexModel
+@{
+    ViewData["Title"] = "لوحة حسابي";
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/account-manage.css" asp-append-version="true" />
+}
+
+<div class="container py-4 py-lg-5 manage-dashboard">
+    <div class="account-manage-hero mb-4 mb-lg-5">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-7">
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                    <div class="status-chip">
+                        <i class="fas @(Model.EmailConfirmed ? "fa-shield-check" : "fa-shield-halved")"></i>
+                        @(Model.EmailConfirmed ? "بريدك مفعل ومؤمَّن" : "يرجى تفعيل البريد الإلكتروني")
+                    </div>
+                    <div class="status-chip">
+                        <i class="fas fa-user-circle"></i>
+                        @string.Join(" / ", Model.Roles)
+                    </div>
+                </div>
+                <h2 class="fw-bold mb-2">@Model.Input.DisplayName</h2>
+                <p class="text-white-50 mb-4">
+                    راقب طلباتك، حدّث بياناتك الشخصية، وأدر مواقع الشحن بكل مرونة في مكان واحد.
+                </p>
+                <div class="row g-3 text-white">
+                    <div class="col-6 col-sm-4">
+                        <div class="stat-pill">
+                            <small class="text-uppercase text-white-50">إجمالي الطلبات</small>
+                            <strong>@Model.Stats.TotalOrders</strong>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="stat-pill">
+                            <small class="text-uppercase text-white-50">إجمالي الدفع</small>
+                            <strong>@Model.Stats.TotalSpent.ToString("N0") ل.س</strong>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="stat-pill">
+                            <small class="text-uppercase text-white-50">آخر طلب</small>
+                            <strong>
+                                @(Model.Stats.LastOrderAt?.ToLocalTime().ToString("yyyy/MM/dd") ?? "—")
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="account-card bg-white bg-opacity-10 border-0">
+                    <h6 class="text-uppercase text-white-50 mb-2">تذكير أمني</h6>
+                    <p class="mb-3">
+                        يوصى بتحديث كلمة المرور بانتظام وتفعيل المصادقة الثنائية فور توفرها لحماية نشاطك التجاري.
+                    </p>
+                    <a class="btn btn-light rounded-pill px-4" asp-area="Identity" asp-page="/Account/Manage/ChangePassword">
+                        ضبط كلمة المرور <i class="fas fa-arrow-left ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8 d-flex flex-column gap-4">
+            <div class="account-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">معلومات الحساب</h5>
+                    <span class="badge bg-light text-dark">
+                        معرف الحساب: @User.Identity?.Name
+                    </span>
+                </div>
+
+                <form method="post" class="settings-form row g-3">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                    <div class="col-md-6">
+                        <label asp-for="Input.DisplayName" class="form-label">الاسم المعروض</label>
+                        <input asp-for="Input.DisplayName" class="form-control" />
+                        <span asp-validation-for="Input.DisplayName" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Input.PhoneNumber" class="form-label">رقم الهاتف</label>
+                        <input asp-for="Input.PhoneNumber" class="form-control" />
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">البريد الإلكتروني</label>
+                        <input class="form-control" value="@User.Identity?.Name" readonly />
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">
+                            حفظ التعديلات
+                        </button>
+                        <span class="ms-3 text-success">@Model.StatusMessage</span>
+                    </div>
+                </form>
+            </div>
+
+            <div class="account-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">آخر الطلبات</h5>
+                    <a class="btn btn-link px-0" asp-area="User" asp-controller="Orders" asp-action="Index">عرض الكل</a>
+                </div>
+                @if (Model.RecentOrders.Any())
+                {
+                    <div class="orders-timeline">
+                        @foreach (var order in Model.RecentOrders)
+                        {
+                            var statusClass = order.Status switch
+                            {
+                                OrderStatus.Pending => "status-pending",
+                                OrderStatus.Accepted => "status-accepted",
+                                OrderStatus.Shipped => "status-shipped",
+                                OrderStatus.Delivered => "status-delivered",
+                                OrderStatus.Cancelled => "status-cancelled",
+                                _ => "status-pending"
+                            };
+                            <div class="order-item">
+                                <div>
+                                    <strong>#@order.Id</strong>
+                                    <p class="text-muted mb-1">
+                                        @order.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")
+                                    </p>
+                                    <span class="order-status-dot @statusClass"></span>
+                                    <span class="text-muted small">@order.Status</span>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold">@order.Total.ToString("N0") ل.س</div>
+                                    <a class="btn btn-sm btn-outline-primary rounded-pill mt-2"
+                                       asp-area="User" asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id">
+                                        تفاصيل الطلب
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state text-center py-4 text-muted">
+                        <i class="fas fa-box-open fa-2x mb-3"></i>
+                        <p class="mb-0">لا توجد طلبات مؤخراً</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4 d-flex flex-column gap-4">
+            <div class="account-card">
+                <h6 class="mb-3">عناوين الشحن</h6>
+                @if (Model.Addresses.Any())
+                {
+                    <div class="addresses-list">
+                        @foreach (var address in Model.Addresses)
+                        {
+                            <div class="address-card @(address.IsDefault ? "is-default" : "")">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">@address.Line1</h6>
+                                    @if (address.IsDefault)
+                                    {
+                                        <span class="badge bg-info text-dark">افتراضي</span>
+                                    }
+                                </div>
+                                <p class="mb-1 text-muted small">@address.City - @address.Country</p>
+                                @if (!string.IsNullOrWhiteSpace(address.Line2))
+                                {
+                                    <p class="mb-0 text-muted small">@address.Line2</p>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-2">لم تقم بإضافة عناوين بعد.</p>
+                }
+                <a class="btn btn-outline-secondary w-100 rounded-pill mt-3"
+                   asp-area="User" asp-controller="Addresses" asp-action="Create">
+                    إدارة العناوين
+                </a>
+            </div>
+
+            <div class="account-card">
+                <h6 class="mb-3">دعم الحساب</h6>
+                <p class="text-muted small mb-3">
+                    نساعدك في تحديث بيانات نشاطك التجاري أو حل أي إشكال تقني خلال دقائق.
+                </p>
+                <div class="d-grid gap-2">
+                    <a class="btn btn-outline-primary rounded-pill"
+                       href="mailto:support@rain-platform.com">
+                        مراسلة الدعم
+                    </a>
+                    <a class="btn btn-outline-danger rounded-pill"
+                       asp-area="Identity" asp-page="/Account/Logout"
+                       asp-route-returnUrl="@Url.Action("Index","Home")">
+                        تسجيل الخروج
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
