@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480" fill="none">
+  <rect width="640" height="480" rx="32" fill="#f3f4f6" />
+  <rect x="72" y="96" width="496" height="288" rx="24" fill="#fff" stroke="#e2e8f0" stroke-width="3" />
+  <circle cx="320" cy="200" r="86" fill="#e2e8f0" />
+  <path d="M229 330c0-37 33-66 91-66s91 29 91 66" stroke="#cbd5f5" stroke-width="18" stroke-linecap="round" />
+  <path d="M277 208c0-25 19-46 43-46 24 0 43 21 43 46s-19 46-43 46c-24 0-43-21-43-46z" fill="#cbd5f5" />
+  <text x="320" y="382" text-anchor="middle" fill="#94a3b8" font-family="'Segoe UI', 'Cairo', sans-serif" font-size="28">صورة المنتج</text>
+</svg>

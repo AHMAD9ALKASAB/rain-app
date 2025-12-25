@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -168,6 +170,56 @@ namespace Rain.Infrastructure.Seed
                 }
                 if (newOfferProducts.Count > 0)
                     await db.SaveChangesAsync();
+            }
+
+            var productImageFiles = new Dictionary<string, string>
+            {
+                ["سماعات RAIN اللاسلكية"] = "سماعات RAIN اللاسلكية صوت نقي وبطارية طويلة.jpg",
+                ["ساعة ذكية Nova"] = "ساعة ذكية Novaتعقب صحة وإشعارات.jpg",
+                ["قميص رجالي كلاسيك"] = "قميص رجالي كلاسيك خامة قطن مريحة.webp",
+                ["فستان صيفي"] = "فستان صيفي تصميم أنيق وخفيف.jpg",
+                ["طقم أواني Casa"] = "طقم أواني Casaمتين وسهل التنظيف.jpg",
+                ["مصباح مكتبي LED"] = "مصباح مكتبي LED إضاءة مريحة للعين.jpg",
+                ["مجفف شعر"] = "مجفف شعر تقنية حماية الشعر.jpg",
+                ["معدات لياقة FitPro"] = "معدات لياقة FitPro تحمل عالي.jpg",
+                ["حاسوب محمول RainBook"] = "حاسوب محمول RainBook شاشة 14 بوصة مع بطاقة رسومات مدمجة.png",
+                ["كاميرا رقمية VisionPro"] = "كاميرا رقمية VisionPro مستشعر 24 ميغابكسل مع تثبيت بصري.png"
+            };
+
+            var targetProductNames = productImageFiles.Keys.ToList();
+            var productsForImages = await db.Products
+                .Where(p => targetProductNames.Contains(p.Name))
+                .Select(p => new { p.Id, p.Name })
+                .ToListAsync();
+
+            var productIds = productsForImages.Select(p => p.Id).ToList();
+            if (productIds.Count > 0)
+            {
+                var existingImageProductIds = await db.ProductImages
+                    .Where(pi => productIds.Contains(pi.ProductId))
+                    .Select(pi => pi.ProductId)
+                    .Distinct()
+                    .ToListAsync();
+
+                var newImages = new List<ProductImage>();
+                foreach (var product in productsForImages)
+                {
+                    if (existingImageProductIds.Contains(product.Id)) continue;
+
+                    var fileName = productImageFiles[product.Name];
+                    newImages.Add(new ProductImage
+                    {
+                        ProductId = product.Id,
+                        Url = $"/images/products/{fileName}",
+                        SortOrder = 0
+                    });
+                }
+
+                if (newImages.Count > 0)
+                {
+                    db.ProductImages.AddRange(newImages);
+                    await db.SaveChangesAsync();
+                }
             }
         }
     }

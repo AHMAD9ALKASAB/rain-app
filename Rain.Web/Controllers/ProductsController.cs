@@ -14,19 +14,7 @@ namespace Rain.Web.Controllers
         private readonly ApplicationDbContext _db;
         private readonly IMemoryCache _cache;
         private const int DefaultPageSize = 12;
-        private static readonly Dictionary<string, string> ProductImageMap = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ["سماعات rain اللاسلكية"] = "/images/products/headphones.jpg",
-            ["ساعة ذكية nova"] = "/images/products/smartwatch.jpg",
-            ["قميص رجالي كلاسيك"] = "/images/products/mens-shirt.jpg",
-            ["فستان صيفي"] = "/images/products/dress.jpg",
-            ["طقم أواني casa"] = "/images/products/home-kit.jpg",
-            ["مصباح مكتبي led"] = "/images/products/lamp.jpg",
-            ["مجفف شعر"] = "/images/products/hairdryer.jpg",
-            ["معدات لياقة fitpro"] = "/images/products/fitness.jpg",
-            ["حاسوب محمول rainbook"] = "/images/products/laptop.jpg",
-            ["كاميرا رقمية visionpro"] = "/images/products/camera.jpg"
-        };
+        private const string DefaultProductImage = "/images/placeholders/product.svg";
 
         private static readonly Dictionary<string, decimal> CurrencyToSypRates = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -113,7 +101,7 @@ namespace Rain.Web.Controllers
             });
             ViewBag.Categories = categories;
             ViewBag.Brands = brands;
-            ViewBag.FallbackImages = ProductImageMap;
+            ViewBag.DefaultProductImage = DefaultProductImage;
             ViewBag.CurrencyRates = CurrencyToSypRates;
 
             return View(items);
@@ -137,7 +125,7 @@ namespace Rain.Web.Controllers
                 var users = await _db.Users.Where(u => supplierIds.Contains(u.Id)).Select(u => new { u.Id, u.DisplayName, u.Email }).ToListAsync();
                 ViewBag.SupplierNames = users.ToDictionary(u => u.Id, u => (string.IsNullOrWhiteSpace(u.DisplayName) ? u.Email : u.DisplayName));
             }
-            ViewBag.FallbackImages = ProductImageMap;
+            ViewBag.DefaultProductImage = DefaultProductImage;
             ViewBag.CurrencyRates = CurrencyToSypRates;
             return View(product);
         }

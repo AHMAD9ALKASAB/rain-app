@@ -16,7 +16,7 @@
     decimal? minPrice = ViewBag.MinPrice as decimal?;
     decimal? maxPrice = ViewBag.MaxPrice as decimal?;
     double? minRating = ViewBag.MinRating as double?;
-    var fallbackImages = ViewBag.FallbackImages as IDictionary<string, string> ?? new Dictionary<string, string>();
+    var defaultImage = ViewBag.DefaultProductImage as string ?? "/images/placeholders/product.svg";
     var currencyRates = ViewBag.CurrencyRates as IDictionary<string, decimal> ?? new Dictionary<string, decimal>();
     string ResolveImage(Product product)
     {
@@ -25,11 +25,7 @@
         {
             return firstImage!;
         }
-        if (fallbackImages.TryGetValue(product.Name, out var fallback))
-        {
-            return fallback;
-        }
-        return $"https://images.unsplash.com/seed/rain-{product.Id}/640x640?auto=format&fit=crop&bg=fff&product";
+        return defaultImage;
     }
 
     decimal? ToSyp(SupplierOffer? offer)
@@ -152,11 +148,18 @@
                     var topRated = activeOffers.Where(o => o.RatingsCount > 0).OrderByDescending(o => o.AverageRating).FirstOrDefault();
                     var heroImage = ResolveImage(item);
                     var minOfferSyp = ToSyp(minOffer);
+                    var galleryImages = item.Images?.Take(3).Select(img => img.Url).Where(url => !string.IsNullOrWhiteSpace(url)).ToList() ?? new List<string>();
                     var offersCount = activeOffers.Count;
                     <div class="col-12 col-sm-6 col-xl-4">
                         <div class="product-card h-100 rounded-4 shadow-sm d-flex flex-column">
                             <div class="product-card__media position-relative overflow-hidden">
                                 <img src="@heroImage" alt="@item.Name" class="product-thumb" loading="lazy" />
+                                <div class="mini-gallery gap-2">
+                                    @foreach (var img in galleryImages.Skip(1))
+                                    {
+                                        <img src="@img" alt="@item.Name" loading="lazy" />
+                                    }
+                                </div>
                                 <div class="product-media-overlay">
                                     <div>
                                         <span class="text-uppercase small text-white-50">@item.Brand?.Name ?? "—"</span>
