@@ -62,6 +62,19 @@
   background: #fff;
   box-shadow: 0 12px 32px rgba(15, 23, 42, .08);
   padding: 1.75rem;
+  color: #0b1120;
+}
+
+.account-card p,
+.account-card span,
+.account-card li,
+.account-card label,
+.account-card .text-muted {
+  color: #0b1120 !important;
+}
+
+.account-card .text-muted {
+  opacity: .7;
 }
 
 .account-card h5,
