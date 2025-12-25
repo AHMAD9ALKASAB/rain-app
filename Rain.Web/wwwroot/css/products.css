@@ -17,6 +17,23 @@
   }
 }
 
+.products-page,
+.product-details-page {
+  color: var(--card-text);
+}
+
+.products-page .text-muted,
+.product-details-page .text-muted {
+  color: var(--card-muted) !important;
+}
+
+.products-page h5,
+.product-details-page h5,
+.products-page h6,
+.product-details-page h6 {
+  color: var(--card-text);
+}
+
 .products-hero {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
   border-radius: 32px;
@@ -78,10 +95,49 @@
 .filter-card,
 .insight-card,
 .product-panel,
-.product-card,
 .supplier-card {
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: var(--card-bg);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: var(--card-text);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.filter-card h5,
+.filter-card p,
+.filter-card label,
+.filter-card .form-label,
+.filter-card .form-control,
+.filter-card .form-select,
+.insight-card h5,
+.insight-card p,
+.product-panel h5,
+.product-panel p,
+.product-panel span,
+.product-panel li,
+.supplier-card h6,
+.supplier-card p {
+  color: var(--card-text);
+}
+
+.filter-card .text-muted,
+.insight-card .text-muted,
+.product-panel .text-muted,
+.supplier-card .text-muted {
+  color: var(--card-muted) !important;
+}
+
+.filters-form .form-control,
+.filters-form .form-select {
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--card-text);
+}
+
+.filters-form .form-control::placeholder,
+.filters-form .form-select option,
+.filters-form input {
+  color: var(--card-muted);
 }
 
 .filter-icon {
@@ -98,7 +154,7 @@
 
 .filters-form .form-label {
   font-weight: 600;
-  color: #1e293b;
+  color: var(--card-text);
 }
 
 .product-card {
@@ -341,10 +397,15 @@ html[dir="rtl"] .me-2 {
 
 .info-chip {
   padding: 1rem;
-  border: 1px dashed #cbd5f5;
+  border: 1px dashed rgba(148, 163, 184, 0.5);
   border-radius: 16px;
-  background: #f8fafc;
+  background: rgba(148, 163, 184, 0.08);
   height: 100%;
+  color: var(--card-text);
+}
+
+.info-chip span {
+  color: var(--card-muted);
 }
 
 @media (max-width: 992px) {
