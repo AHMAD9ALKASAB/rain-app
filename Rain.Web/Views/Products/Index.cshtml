@@ -148,45 +148,33 @@
                     var topRated = activeOffers.Where(o => o.RatingsCount > 0).OrderByDescending(o => o.AverageRating).FirstOrDefault();
                     var heroImage = ResolveImage(item);
                     var minOfferSyp = ToSyp(minOffer);
-                    var galleryImages = item.Images?.Take(3).Select(img => img.Url).Where(url => !string.IsNullOrWhiteSpace(url)).ToList() ?? new List<string>();
                     var offersCount = activeOffers.Count;
                     <div class="col-12 col-sm-6 col-xl-4">
                         <div class="product-card h-100 rounded-4 shadow-sm d-flex flex-column">
-                            <div class="product-card__media position-relative overflow-hidden">
+                            <div class="product-card__media">
                                 <img src="@heroImage" alt="@item.Name" class="product-thumb" loading="lazy" />
-                                <div class="mini-gallery gap-2">
-                                    @foreach (var img in galleryImages.Skip(1))
-                                    {
-                                        <img src="@img" alt="@item.Name" loading="lazy" />
-                                    }
-                                </div>
-                                <div class="product-media-overlay">
-                                    <div>
-                                        <span class="text-uppercase small text-white-50">@item.Brand?.Name ?? "—"</span>
-                                        <p class="mb-0 text-white">@item.Category?.Name ?? L["Category"]</p>
-                                    </div>
-                                    <span class="text-white-50 small"><i class="fas fa-box-open me-1"></i>@offersCount @L["Offers"]</span>
-                                </div>
-                                @if (topRated != null && topRated.AverageRating >= 4)
-                                {
-                                    <span class="product-badge">@string.Format("{0:0.0}★", topRated.AverageRating)</span>
-                                }
                             </div>
                             <div class="product-card__body d-flex flex-column flex-grow-1">
-                                <span class="product-category text-uppercase small text-muted">@item.Category?.Name</span>
-                                <h5 class="mt-1 mb-2 text-truncate">@item.Name</h5>
-                                <p class="text-muted small mb-3 line-clamp-2">@item.Description</p>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="product-category">@item.Category?.Name ?? "منتجات عامة"</span>
+                                    <span class="product-tag"><i class="fas fa-box-open"></i>@offersCount عرض</span>
+                                </div>
+                                <h5 class="product-name text-truncate mb-2">@item.Name</h5>
+                                <p class="product-desc mb-3 line-clamp-2">@(!string.IsNullOrWhiteSpace(item.Description) ? item.Description : "تفاصيل المنتج ستتوفر قريباً.")</p>
                                 <div class="product-card__meta mb-3">
-                                    <span class="meta-chip">
-                                        <i class="fas fa-user-tie me-1"></i>@(item.SellerName ?? item.Brand?.Name ?? "RAIN")
+                                    <span class="product-tag">
+                                        <i class="fas fa-store"></i>@(item.SellerName ?? item.Brand?.Name ?? "متجر Rain")
                                     </span>
-                                    <span class="meta-chip">
-                                        <i class="fas fa-language me-1"></i>@(item.Brand?.Name ?? "—")
-                                    </span>
-                                    @if (topRated != null)
+                                    @if (!string.IsNullOrWhiteSpace(item.Brand?.Name))
                                     {
-                                        <span class="meta-chip rating-chip">
-                                            <i class="fas fa-star me-1"></i>@topRated.AverageRating.ToString("0.0") (@topRated.RatingsCount)
+                                        <span class="product-tag">
+                                            <i class="fas fa-certificate"></i>@item.Brand!.Name
+                                        </span>
+                                    }
+                                    @if (topRated != null && topRated.RatingsCount > 0)
+                                    {
+                                        <span class="product-tag">
+                                            <i class="fas fa-star text-warning"></i>@topRated.AverageRating.ToString("0.0") / 5
                                         </span>
                                     }
                                 </div>
@@ -198,8 +186,8 @@
                                             <small class="text-muted">@minOffer.Currency</small>
                                             @if (minOfferSyp.HasValue)
                                             {
-                                                <div class="text-muted small">
-                                                    ≈ @minOfferSyp.Value.ToString("N0") ل.س
+                                                <div class="price-convert">
+                                                    ≈ @minOfferSyp.Value.ToString("N0") ليرة سورية
                                                 </div>
                                             }
                                         </div>

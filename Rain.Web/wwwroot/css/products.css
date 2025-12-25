@@ -4,6 +4,17 @@
   --rain-dark: #0f172a;
   --rain-muted: #94a3b8;
   --rain-light: #f8fafc;
+  --card-bg: #ffffff;
+  --card-text: #0f172a;
+  --card-muted: #475569;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --card-bg: rgba(15, 23, 42, 0.9);
+    --card-text: #f8fafc;
+    --card-muted: #cbd5f5;
+  }
 }
 
 .products-hero {
@@ -93,6 +104,9 @@
 .product-card {
   border-radius: 24px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: var(--card-bg);
+  color: var(--card-text);
+  border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
 .product-card:hover {
@@ -101,13 +115,9 @@
 }
 
 .product-card__media {
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  background: #e2e8f0;
   border-radius: 22px;
-  padding: 0.75rem;
   aspect-ratio: 4 / 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
 }
 
@@ -115,9 +125,9 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-  transition: transform 0.25s ease;
+  display: block;
+  border-radius: 22px;
+  transition: transform 0.3s ease;
 }
 
 .product-card__media:hover .product-thumb {
@@ -149,9 +159,25 @@
   letter-spacing: 0.05rem;
 }
 
+.product-card__body {
+  padding: 1.5rem 1.25rem 1.25rem;
+}
+
 .product-category {
-  letter-spacing: 0.15rem;
-  color: var(--rain-muted);
+  letter-spacing: 0.08rem;
+  color: var(--card-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.product-name {
+  color: var(--card-text);
+  font-weight: 700;
+}
+
+.product-desc {
+  color: var(--card-muted);
+  font-size: 0.95rem;
 }
 
 .product-card .price {
@@ -160,9 +186,26 @@
   color: var(--rain-primary);
 }
 
+.product-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.product-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--card-text);
+  font-size: 0.85rem;
+}
+
 .price-convert {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--card-muted);
 }
 
 .view-toggle {
