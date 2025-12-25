@@ -4,6 +4,9 @@
     ViewData["Title"] = Model.Name;
     var fallbackImages = ViewBag.FallbackImages as IDictionary<string, string> ?? new Dictionary<string, string>();
     var currencyRates = ViewBag.CurrencyRates as IDictionary<string, decimal> ?? new Dictionary<string, decimal>();
+    var brandName = !string.IsNullOrWhiteSpace(Model.Brand?.Name) ? Model.Brand!.Name : "غير متوفر";
+    var supplierName = !string.IsNullOrWhiteSpace(Model.SellerName) ? Model.SellerName! : "غير محدد";
+    var description = !string.IsNullOrWhiteSpace(Model.Description) ? Model.Description! : "لا تتوفر تفاصيل إضافية لهذا المنتج في الوقت الحالي. سنحدّثها قريباً.";
     string ResolveImage()
     {
         var first = Model.Images?.FirstOrDefault()?.Url;
@@ -42,6 +45,7 @@
     var heroImage = ResolveImage();
 }
 
+<div class="product-details-page">
 <div class="product-details-hero text-white py-5 mb-5">
     <div class="container position-relative">
         <nav aria-label="breadcrumb">
@@ -54,7 +58,7 @@
             <div class="col-lg-7">
                 <span class="badge rounded-pill bg-gradient">@Model.Category?.Name</span>
                 <h1 class="display-5 fw-bold mt-3 mb-3">@Model.Name</h1>
-                <p class="lead text-white-50 mb-4">@Model.Description</p>
+                <p class="lead text-white-50 mb-4">@description</p>
                 @if (bestOffer != null)
                 {
                     <div class="d-flex align-items-center gap-3">
@@ -102,25 +106,25 @@
 <div class="container pb-5">
     <div class="row g-4">
         <div class="col-lg-8">
-            <div class="product-panel rounded-4 p-4 mb-4 shadow-sm">
-                <h5 class="mb-3">عن المنتج</h5>
+            <div class="product-panel accent-panel rounded-4 p-4 mb-4 shadow-sm">
+                <h5 class="mb-3 section-title">عن المنتج</h5>
                 <div class="row g-3">
                     <div class="col-sm-6">
                         <div class="info-chip">
-                            <span class="text-muted small">العلامة التجارية</span>
-                            <div class="fw-semibold">@Model.Brand?.Name ?? "—"</div>
+                            <span>العلامة التجارية</span>
+                            <div class="fw-semibold">@brandName</div>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="info-chip">
-                            <span class="text-muted small">المورد الأصلي</span>
-                            <div class="fw-semibold">@Model.SellerName ?? "—"</div>
+                            <span>المورد الأصلي</span>
+                            <div class="fw-semibold">@supplierName</div>
                         </div>
                     </div>
                     <div class="col-12">
                         <div class="info-chip">
-                            <span class="text-muted small">الوصف</span>
-                            <p class="mb-0">@Model.Description</p>
+                            <span>الوصف</span>
+                            <p class="mb-0">@description</p>
                         </div>
                     </div>
                 </div>

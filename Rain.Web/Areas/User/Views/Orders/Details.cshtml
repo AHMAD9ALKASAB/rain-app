@@ -1,51 +1,113 @@
 @using Rain.Domain.Entities
+@using Rain.Domain.Enums
 @model Order
 @{
     ViewData["Title"] = $"تفاصيل الطلب #{Model.Id}";
-}
-<div class="container py-3">
-    <h3 class="mb-3">تفاصيل الطلب #@Model.Id</h3>
-    <div class="row g-3">
-        <div class="col-md-6">
-            <div><strong>التاريخ:</strong> @Model.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</div>
-            <div><strong>الحالة:</strong> @Model.Status</div>
-            <div><strong>الإجمالي:</strong> @Model.Total.ToString("0.00")</div>
-        </div>
-        <div class="col-md-6">
-            <div><strong>عنوان الشحن:</strong> @Model.ShippingAddress?.Line1, @Model.ShippingAddress?.City</div>
-        </div>
-    </div>
-    <hr />
-    <h5>العناصر</h5>
-    <div class="table-responsive">
-        <table class="table table-sm align-middle">
-            <thead>
-                <tr>
-                    <th>المنتج</th>
-                    <th>السعر</th>
-                    <th>الكمية</th>
-                    <th>الإجمالي</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var i in Model.Items)
-            {
-                <tr>
-                    <td>@i.SupplierOffer?.Product?.Name</td>
-                    <td>@i.UnitPrice.ToString("0.00")</td>
-                    <td>@i.Quantity</td>
-                    <td>@(i.UnitPrice * i.Quantity).ToString("0.00")</td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
-    @if (Model.Status == Rain.Domain.Enums.OrderStatus.Shipped)
+    string StatusLabel(OrderStatus status) => status switch
     {
-        <form method="post" asp-action="ConfirmDelivery" asp-route-id="@Model.Id" class="mt-3">
-            @Html.AntiForgeryToken()
-            <button class="btn btn-success">تأكيد الاستلام</button>
-        </form>
-    }
-    <a class="btn btn-secondary" href="@Url.Action("Index")">رجوع</a>
+        OrderStatus.Pending => "قيد المراجعة",
+        OrderStatus.Accepted => "تم القبول",
+        OrderStatus.Shipped => "جارٍ الشحن",
+        OrderStatus.Delivered => "تم التسليم",
+        OrderStatus.Cancelled => "ملغي",
+        _ => status.ToString()
+    };
+    var totalItems = Model.Items.Sum(i => i.Quantity);
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/orders.css" asp-append-version="true" />
+}
+
+<div class="container py-4 py-lg-5">
+    <div class="order-detail-hero mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <p class="text-uppercase small mb-1">تفاصيل الطلب</p>
+                <h2 class="fw-bold mb-2">الطلب رقم #@Model.Id</h2>
+                <span class="text-white-50">تم الإنشاء في @Model.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</span>
+            </div>
+            <span class="order-status-badge @($"status-{Model.Status.ToString().ToLower()}") bg-white text-dark">
+                <i class="fas fa-circle"></i> @StatusLabel(Model.Status)
+            </span>
+        </div>
+        <div class="detail-grid mt-4">
+            <div class="panel">
+                <span>إجمالي الطلب</span>
+                <strong>@Model.Total.ToString("N0") ل.س</strong>
+            </div>
+            <div class="panel">
+                <span>عدد العناصر</span>
+                <strong>@totalItems عنصر</strong>
+            </div>
+            <div class="panel">
+                <span>عنوان الشحن</span>
+                <strong>@(Model.ShippingAddress?.Line1 ?? "غير محدد")</strong>
+                <div class="text-white-50">@Model.ShippingAddress?.City</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-xl-8">
+            <div class="order-card">
+                <div class="order-card__header">
+                    <h5>العناصر المشتراة</h5>
+                </div>
+                <div class="order-items">
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="order-item-card">
+                            <div class="avatar">@item.SupplierOffer?.Product?.Name?.FirstOrDefault()</div>
+                            <div>
+                                <strong>@item.SupplierOffer?.Product?.Name</strong>
+                                <p class="text-muted small mb-0">@item.SupplierOffer?.Product?.Category?.Name</p>
+                            </div>
+                            <div class="ms-auto text-end">
+                                <div class="fw-bold">@item.UnitPrice.ToString("0.00")</div>
+                                <span class="text-muted small">الكمية: @item.Quantity</span>
+                                <div class="text-muted small">الإجمالي: @(item.UnitPrice * item.Quantity).ToString("0.00")</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (Model.Status == OrderStatus.Shipped)
+            {
+                <div class="order-card">
+                    <h5 class="mb-3">التأكيد</h5>
+                    <p class="text-muted mb-3">تم شحن طلبك. يرجى تأكيد الاستلام بعد وصول الشحنة.</p>
+                    <form method="post" asp-action="ConfirmDelivery" asp-route-id="@Model.Id">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-success rounded-pill px-4">تأكيد الاستلام</button>
+                    </form>
+                </div>
+            }
+        </div>
+        <div class="col-xl-4">
+            <div class="order-summary">
+                <h6 class="mb-3">ملخص الشراء</h6>
+                <ul>
+                    <li>
+                        <span>مجموع العناصر</span>
+                        <strong>@totalItems</strong>
+                    </li>
+                    <li>
+                        <span>المدفوع</span>
+                        <strong>@Model.Total.ToString("N0") ل.س</strong>
+                    </li>
+                    <li>
+                        <span>الحالة الحالية</span>
+                        <strong>@StatusLabel(Model.Status)</strong>
+                    </li>
+                </ul>
+                <p class="text-muted small mb-0">في حال وجود استفسار حول الطلب يمكنك مراسلة فريق الدعم.</p>
+            </div>
+
+            <a class="btn btn-outline-primary w-100 rounded-pill mt-3" href="@Url.Action("Index")">
+                الرجوع إلى الطلبات
+            </a>
+        </div>
+    </div>
 </div>

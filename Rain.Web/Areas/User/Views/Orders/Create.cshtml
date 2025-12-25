@@ -3,42 +3,141 @@
 @{
     ViewData["Title"] = "إنشاء طلب";
     var offer = ViewBag.Offer as SupplierOffer;
+    var quantity = Model?.Quantity > 0 ? Model.Quantity : 1;
+    var price = offer?.Price ?? 0m;
+    var total = price * quantity;
+    var currency = offer?.Currency ?? "KWD";
 }
-<div class="container py-3">
-    <h3 class="mb-3">إنشاء طلب</h3>
 
-    @if (offer != null)
-    {
-        <div class="alert alert-info">
-            <div><strong>المنتج:</strong> @offer.Product?.Name</div>
-            <div><strong>السعر:</strong> @offer.Price.ToString("0.00")</div>
-            <input type="hidden" name="SupplierOfferId" value="@offer.Id" />
+@section Styles {
+    <link rel="stylesheet" href="~/css/orders.css" asp-append-version="true" />
+}
+
+<div class="container py-4 py-lg-5">
+    <div class="order-stepper mb-4">
+        <div class="step active">
+            <span>الخطوة ١</span>
+            <strong>اختيار العرض</strong>
         </div>
-    }
+        <div class="step active">
+            <span>الخطوة ٢</span>
+            <strong>تأكيد البيانات</strong>
+        </div>
+        <div class="step">
+            <span>الخطوة ٣</span>
+            <strong>إتمام الطلب</strong>
+        </div>
+    </div>
 
-    <form method="post">
-        @Html.AntiForgeryToken()
-        @if (offer == null)
-        {
-            <div class="mb-3">
-                <label class="form-label">العرض</label>
-                <input asp-for="SupplierOfferId" class="form-control" />
+    <div class="order-form-wrapper">
+        <div class="order-form-header">
+            <div>
+                <p class="text-uppercase small text-muted mb-1">إنشاء طلب جديد</p>
+                <h3 class="mb-0">راجع تفاصيل العرض وأدخل بيانات الشحن</h3>
             </div>
-        }
-        <div class="mb-3">
-            <label class="form-label">الكمية</label>
-            <input asp-for="Quantity" class="form-control" />
-            <span asp-validation-for="Quantity" class="text-danger"></span>
+            <a class="btn btn-outline-secondary rounded-pill" asp-area="" asp-controller="Products" asp-action="Index">
+                استكشاف عروض أخرى
+            </a>
         </div>
-        <div class="mb-3">
-            <label class="form-label">عنوان الشحن</label>
-            <select asp-for="ShippingAddressId" class="form-select" asp-items="ViewBag.Addresses"></select>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="order-form-card mb-4">
+                    @if (offer != null)
+                    {
+                        <div class="d-flex flex-wrap justify-content-between gap-3">
+                            <div>
+                                <p class="text-muted small mb-1">المنتج</p>
+                                <h5 class="mb-1">@offer.Product?.Name</h5>
+                                <p class="mb-0 text-muted-small">@offer.Product?.Category?.Name</p>
+                            </div>
+                            <div>
+                                <p class="text-muted small mb-1">السعر الحالي</p>
+                                <h4 class="mb-0">@price.ToString("0.00") <small>@currency</small></h4>
+                                <span class="text-muted small">الحد الأدنى: @offer.MinOrderQty | المخزون: @offer.StockQty</span>
+                            </div>
+                        </div>
+                        <input type="hidden" name="SupplierOfferId" value="@offer.Id" />
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning mb-0">
+                            لم يتم تمرير عرض محدد. يرجى إدخال رقم العرض الذي تود طلبه.
+                        </div>
+                    }
+                </div>
+
+                @Html.ValidationSummary(false, "", new { @class = "text-danger mb-3" })
+                <form method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="order-form-grid mb-3">
+                        @if (offer == null)
+                        {
+                            <div>
+                                <label class="form-label">رقم العرض</label>
+                                <input asp-for="SupplierOfferId" class="form-control" />
+                                <span asp-validation-for="SupplierOfferId" class="text-danger mt-1 d-block"></span>
+                            </div>
+                        }
+                        <div>
+                            <label class="form-label">الكمية</label>
+                            <input asp-for="Quantity" class="form-control" min="1" />
+                            <span asp-validation-for="Quantity" class="text-danger mt-1 d-block"></span>
+                        </div>
+                        <div>
+                            <label class="form-label">عنوان الشحن</label>
+                            <select asp-for="ShippingAddressId" class="form-select" asp-items="ViewBag.Addresses">
+                                <option value="">اختر عنواناً</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="order-cta">
+                        <button class="btn btn-primary rounded-pill px-4">تأكيد الطلب</button>
+                        <a class="btn btn-outline-secondary rounded-pill px-4" href="@Url.Action("Index")">رجوع</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="order-summary-card">
+                    <p class="text-uppercase small mb-1">ملخص الطلب</p>
+                    <h4 class="fw-bold mb-3">@((offer?.Product?.Name) ?? "—")</h4>
+                    <ul>
+                        <li>
+                            <span>سعر الوحدة</span>
+                            <strong>@price.ToString("0.00") @currency</strong>
+                        </li>
+                        <li>
+                            <span>الكمية</span>
+                            <strong>@quantity</strong>
+                        </li>
+                        <li>
+                            <span>الإجمالي</span>
+                            <strong>@total.ToString("0.00") @currency</strong>
+                        </li>
+                    </ul>
+                    <p class="small text-muted mb-2">قد تضاف رسوم الشحن أو الضرائب حسب جهة التوصيل.</p>
+                    <div class="address-pill">
+                        <strong>عنوان الشحن المختار</strong>
+                        <span>سيتم إرسال الطلب إلى العنوان الذي تختاره من القائمة.</span>
+                    </div>
+                </div>
+
+                <div class="order-glass-card mt-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div>
+                            <strong>تحتاج مساعدة؟</strong>
+                            <p class="text-muted mb-1 small">فريق الدعم متواجد لمساعدتك في أي استفسار حول الطلب.</p>
+                            <a href="mailto:support@rain-platform.com" class="btn btn-link p-0">مراسلة الدعم</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>
-            <button class="btn btn-primary">تأكيد الطلب</button>
-            <a class="btn btn-secondary" href="@Url.Action("Index")">رجوع</a>
-        </div>
-    </form>
+    </div>
 </div>
 @section Scripts{
     <partial name="_ValidationScriptsPartial" />

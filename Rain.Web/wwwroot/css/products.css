@@ -7,6 +7,7 @@
   --card-bg: #ffffff;
   --card-text: #0f172a;
   --card-muted: #475569;
+  --panel-accent: rgba(75, 123, 236, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -326,10 +327,21 @@
   background: #fff;
 }
 
+.product-panel.accent-panel {
+  background: linear-gradient(145deg, rgba(75, 123, 236, 0.08), rgba(248, 250, 252, 0.95));
+  border-color: rgba(75, 123, 236, 0.35);
+}
+
+.product-panel .section-title {
+  font-weight: 700;
+  color: var(--card-text);
+}
+
 .product-panel .info-chip {
   border: 1px solid rgba(148, 163, 184, 0.3);
   border-radius: 16px;
   padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.75);
 }
 
 .mini-kpis {
@@ -399,13 +411,28 @@ html[dir="rtl"] .me-2 {
   padding: 1rem;
   border: 1px dashed rgba(148, 163, 184, 0.5);
   border-radius: 16px;
-  background: rgba(148, 163, 184, 0.08);
+  background: rgba(255, 255, 255, 0.8);
   height: 100%;
   color: var(--card-text);
 }
 
 .info-chip span {
   color: var(--card-muted);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
+.quick-stats-card {
+  border-radius: 20px;
+  background: linear-gradient(160deg, #4b7bec, #1f3b75);
+  color: #fff;
+  padding: 1.5rem;
+  box-shadow: 0 20px 35px rgba(15, 23, 42, 0.25);
+}
+
+.quick-stats-card span {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 @media (max-width: 992px) {
